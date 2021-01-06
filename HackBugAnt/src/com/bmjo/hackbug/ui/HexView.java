@@ -5,7 +5,7 @@
  */
 package com.bmjo.hackbug.ui;
 
-import java.lang.System.Logger;
+//import java.lang.System.Logger;
 import java.util.logging.Level;
 import javax.swing.table.DefaultTableModel;
 
@@ -69,7 +69,7 @@ public class HexView extends javax.swing.JPanel {
              }
            }
            catch(Exception exp){
-              java.util.logging.Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, exp);
+              java.util.logging.Logger.getLogger(HexView.class.getName()).log(Level.SEVERE, null, exp);
            }
             
         }
