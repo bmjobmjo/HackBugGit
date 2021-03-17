@@ -60,9 +60,9 @@ public class MainControler {
             conEvent.onError(type,param);
         }
     }
-    public static void fireConEvent(ConEvents type, Object param){
+    public static void fireConEvent(ConEvents type, Object param, Object source){
         for(IConnectionEvents conEvent :eventHandlers ){
-            conEvent.onEvent(type,param);
+            conEvent.onEvent(type,param,source);
         }
     }
      public static void fireConModeEvent(ConnectionMode type){
@@ -73,6 +73,12 @@ public class MainControler {
     public static void AddConEventListner(IConnectionEvents eventListner){
         if(eventListner!=null) {
           if(!eventHandlers.contains(eventListner))eventHandlers.add(eventListner);
+      }
+    }
+    
+     public static void RemoveConEventListner(IConnectionEvents eventListner){
+        if(eventListner!=null) {
+          if(!eventHandlers.contains(eventListner))eventHandlers.remove(eventListner);
       }
     }
     

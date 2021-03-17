@@ -61,7 +61,7 @@ public class TcpConnection implements IConnection {
         try {
             con = new Socket();
             con.connect(new InetSocketAddress(conParam.serverIP, conParam.port), 30000);
-            MainControler.fireConEvent(MainControler.ConEvents.Connected, "Connected to: "+conParam.serverIP+ "Port: "+conParam.port+"\r\n");
+            MainControler.fireConEvent(MainControler.ConEvents.Connected, "Connected to: "+conParam.serverIP+ "Port: "+conParam.port+"\r\n",this);
              
             out = (OutputStream) con.getOutputStream();
             in = (InputStream) con.getInputStream();
@@ -71,7 +71,7 @@ public class TcpConnection implements IConnection {
             conName = conParam.serverIP+":"+conParam.port+":"+CommonDataArea.conCount;
             return true;
         } catch (Exception exp) {
-             MainControler.fireConEvent(MainControler.ConEvents.ConFailed, exp.getMessage()+"\r\n");
+             MainControler.fireConEvent(MainControler.ConEvents.ConFailed, exp.getMessage()+"\r\n",this);
 
             return false;
         }
@@ -112,7 +112,7 @@ public class TcpConnection implements IConnection {
     public boolean close() {
         try {
             con.close();
-            MainControler.fireConEvent(MainControler.ConEvents.ConClosed,"Connnection Closed \r\n");
+            MainControler.fireConEvent(MainControler.ConEvents.ConClosed,"Connnection Closed \r\n",this);
 
             return true;
         } catch (Exception exp) {
@@ -134,7 +134,7 @@ public class TcpConnection implements IConnection {
                     if(numBytes==-1) break;
                     MainControler.onReceive(readData, numBytes, TcpConnection.this, null);
                 }
-                MainControler.fireConEvent(MainControler.ConEvents.ConClosed, "Connnection Closed \r\n");
+                MainControler.fireConEvent(MainControler.ConEvents.ConClosed, "Connnection Closed \r\n",this);
             } catch (Exception exp) {
 
             }

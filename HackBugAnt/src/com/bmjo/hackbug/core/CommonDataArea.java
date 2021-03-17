@@ -6,6 +6,12 @@
 package com.bmjo.hackbug.core;
 
 import com.bmjo.hackbug.core.MainControler.ConnectionMode;
+import com.bmjo.hackbug.tcpserver.TcpConnectionContext;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Vector;
+import javax.swing.DefaultListModel;
 
 
 
@@ -17,5 +23,8 @@ public class CommonDataArea {
     public static ConnectionMode connectionMode;
     public static IConnection connection;
     public static int conCount=0;
+    public static ArrayList<TcpConnectionContext> conList;
+    public static Vector<String> conInfoList;
+    public static ArrayList<String> selectedCon;
     
 }

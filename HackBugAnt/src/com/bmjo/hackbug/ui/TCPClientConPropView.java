@@ -149,12 +149,14 @@ public class TCPClientConPropView extends javax.swing.JPanel {
             }
 
         @Override
-        public void onEvent(MainControler.ConEvents event, Object param) {
+        public void onEvent(MainControler.ConEvents event, Object param, Object source) {
+            if(source instanceof TcpConnection){
            if(event == ConEvents.Connected){
                jButton1.setText("Close");
             }else if(event == ConEvents.ConClosed){
                  jButton1.setText("Connect");
             }        
+            }
         }
 
         @Override

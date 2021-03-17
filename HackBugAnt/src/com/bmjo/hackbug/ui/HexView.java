@@ -42,6 +42,27 @@ public class HexView extends javax.swing.JPanel {
         
       
     }
+    
+    public void ClearContents()
+    {
+         dtm = new DefaultTableModel(0, 0);
+       dtm2 = new DefaultTableModel(0, 0);
+       String header[] = new String[18];
+       for(int i=0;i<18;++i){
+           header[i]= ""+(i+1);
+       }
+       dtm.setColumnIdentifiers(header);
+       dtm2.setColumnIdentifiers(header);
+       
+       jTable1.setModel(dtm);
+       jTable3.setModel(dtm2);
+       
+        String [] vals = new String[16];
+        dtm.addRow(vals);
+        dtm2.addRow(vals);
+        row=0;
+        col=0;
+    }
 
     public void appendData(byte[] data, int numBytes) {
            try{

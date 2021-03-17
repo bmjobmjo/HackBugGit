@@ -4,6 +4,7 @@
  * and open the template in the editor.
  */
 package com.bmjo.hackbug.ui;
+import com.bmjo.hackbug.core.CommandInterpretor;
 import com.bmjo.hackbug.core.CommonDataArea;
 import com.bmjo.hackbug.core.IConnection;
 import com.bmjo.hackbug.core.IConnectionEvents;
@@ -11,12 +12,14 @@ import com.bmjo.hackbug.core.MainControler;
 import com.bmjo.hackbug.core.MainControler.ConEvents;
 import java.awt.CardLayout;
 import java.awt.Component;
+import java.awt.Image;
 import java.awt.List;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -41,6 +44,8 @@ import org.w3c.dom.events.Event;
 import org.xml.sax.Attributes;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
@@ -63,11 +68,35 @@ public class MainForm extends javax.swing.JFrame {
         MainControler.AddConEventListner(new ConEventsHandler());
          loadPerstValues();
          
+         String script = "WaitFor \"hello world\" \r\nLabel\r\nwaitsec 100 \r\n Goto 1\r\nLabel 1\r\n ActonOn \"ATDP 123345\" \\x667766 \"ATMK\" \\x6789\r\n" +
+"Action 1\r\n" +
+"Send \"\\x6677\" \r\n" +
+"END \r\n" +
+"Action 2\r\n" +
+"Send \"\\x66887\" \r\n" +
+"Default\r\n" +
+"Send \"\\x6996887\" \r\n" +
+"END \"hello\" \"biju\" \"mon\" \\x3344a \\xA45B \"Kill\" \r\n"+
+"END 2\r\n";
+      //  CommandInterpretor cmdInter = new CommandInterpretor();
+      //   cmdInter.Execute(script);
+         
          addWindowListener(new WindowAdapter() {
              public void windowClosing(WindowEvent e){
                    savePersistValues();
                 }
          });
+         try{
+          BufferedImage img = null;
+          String fileName = ClassLoader.getSystemResource("res/HackBug.png").getFile();
+          img = ImageIO.read(new File(fileName));
+          Image dimg = img.getScaledInstance(logoLabel.getWidth(), logoLabel.getHeight(),
+            Image.SCALE_SMOOTH);
+          ImageIcon imageIcon = new ImageIcon(dimg);
+          logoLabel.setIcon(imageIcon);
+         }catch(Exception exp){
+             Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, exp);
+         }
     }
 
    
@@ -97,7 +126,7 @@ public class MainForm extends javax.swing.JFrame {
                 String compoName = "SendText"+i;
                 JTextField sednText = new JTextField();
 
-                for (Component sendTextCom : jPanel1SendArea.getComponents()) {
+                for (Component sendTextCom : CommandInputContralArrayPanel.getComponents()) {
                     try {
                         if (((JTextField) sendTextCom).getName().contains(compoName)) {
                             sednText = (JTextField) sendTextCom;
@@ -148,7 +177,7 @@ public void savePersistValues() {
                 String compoName = "SendText"+i;
                 JTextField sednText = new JTextField();
 
-                for (Component sendTextCom : jPanel1SendArea.getComponents()) {
+                for (Component sendTextCom : CommandInputContralArrayPanel.getComponents()) {
                     try {
                         if (((JTextField) sendTextCom).getName().contains(compoName)) {
                             sednText = (JTextField) sendTextCom;
@@ -184,6 +213,7 @@ public void savePersistValues() {
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        java.awt.GridBagConstraints gridBagConstraints;
 
         buttonGroup1 = new javax.swing.ButtonGroup();
         buttonGroup2 = new javax.swing.ButtonGroup();
@@ -192,13 +222,34 @@ public void savePersistValues() {
         buttonGroup5 = new javax.swing.ButtonGroup();
         buttonGroup6 = new javax.swing.ButtonGroup();
         ConnectionManagerPanel = new javax.swing.JPanel();
+        ConnectionModePanel = new javax.swing.JPanel();
         connectionMode1 = new com.bmjo.hackbug.ui.ConnectionModeView();
+        ConnectionParamsPanel = new javax.swing.JPanel();
         ConnectionParamPanel = new javax.swing.JPanel();
         serialPortConPropSel1 = new com.bmjo.hackbug.ui.SerialPortConPropView();
         tCPClientConPropView1 = new com.bmjo.hackbug.ui.TCPClientConPropView();
+        tCPServerConPropView1 = new com.bmjo.hackbug.ui.TCPServerConPropView();
+        LogoPanel = new javax.swing.JPanel();
+        logoLabel = new javax.swing.JLabel();
         WorkAreaPanel = new javax.swing.JPanel();
         GeneralTab = new javax.swing.JPanel();
-        jPanel1SendArea = new javax.swing.JPanel();
+        HexNormalViewHolder = new javax.swing.JTabbedPane();
+        textAreaInputText = new java.awt.TextArea();
+        hexView1 = new com.bmjo.hackbug.ui.HexView();
+        commandProgExecPanel2 = new com.bmjo.hackbug.ui.CommandProgExecPanel();
+        SaveNDisplayOptionPanel = new javax.swing.JPanel();
+        SaveToFilePanel = new javax.swing.JPanel();
+        textSelectedFolder = new javax.swing.JTextField();
+        buttonSelectDir = new javax.swing.JButton();
+        checkSaveToFile = new javax.swing.JCheckBox();
+        checkboxTimeStamp = new javax.swing.JCheckBox();
+        DisplayOptionsPanel = new javax.swing.JPanel();
+        checkRealtimeDisplay = new javax.swing.JCheckBox();
+        checkboxEcho = new javax.swing.JCheckBox();
+        buttonClearText = new javax.swing.JButton();
+        jButton1 = new javax.swing.JButton();
+        CommandInputPanel = new javax.swing.JPanel();
+        CommandInputContralArrayPanel = new javax.swing.JPanel();
         SendText1 = new javax.swing.JTextField();
         SendText2 = new javax.swing.JTextField();
         SendText3 = new javax.swing.JTextField();
@@ -211,20 +262,7 @@ public void savePersistValues() {
         SendButton4 = new javax.swing.JButton();
         SendButton5 = new javax.swing.JButton();
         SendButton6 = new javax.swing.JButton();
-        HexNormalViewHolder = new javax.swing.JTabbedPane();
-        textAreaInputText = new java.awt.TextArea();
-        hexView1 = new com.bmjo.hackbug.ui.HexView();
-        SaveToFilePanel = new javax.swing.JPanel();
-        textSelectedFolder = new javax.swing.JTextField();
-        buttonSelectDir = new javax.swing.JButton();
-        checkSaveToFile = new javax.swing.JCheckBox();
-        checkboxTimeStamp = new javax.swing.JCheckBox();
-        jPanel1 = new javax.swing.JPanel();
-        checkRealtimeDisplay = new javax.swing.JCheckBox();
-        checkboxEcho = new javax.swing.JCheckBox();
-        buttonClearText = new javax.swing.JButton();
-        jButton1 = new javax.swing.JButton();
-        jPanel2 = new javax.swing.JPanel();
+        MiscPanel = new javax.swing.JPanel();
         jTextField1 = new javax.swing.JTextField();
         jLabel1 = new javax.swing.JLabel();
         jButton2 = new javax.swing.JButton();
@@ -233,15 +271,32 @@ public void savePersistValues() {
         buttonSaveCommandsToFile = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("MianFrame");
+        setTitle("HackBug");
         setName("MainFrame"); // NOI18N
+        getContentPane().setLayout(new java.awt.GridBagLayout());
 
         ConnectionManagerPanel.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        ConnectionManagerPanel.setAlignmentY(1.0F);
         ConnectionManagerPanel.setName("ConMode"); // NOI18N
-        ConnectionManagerPanel.setLayout(new java.awt.BorderLayout());
+        ConnectionManagerPanel.setPreferredSize(new java.awt.Dimension(250, 104));
+        ConnectionManagerPanel.setLayout(new java.awt.BorderLayout(3, 3));
 
+        ConnectionModePanel.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        ConnectionModePanel.setMinimumSize(new java.awt.Dimension(100, 100));
+        ConnectionModePanel.setName(""); // NOI18N
+        ConnectionModePanel.setPreferredSize(new java.awt.Dimension(100, 50));
+        ConnectionModePanel.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER, 10, 5));
+
+        connectionMode1.setBorder(null);
         connectionMode1.setName("ConnectionProp"); // NOI18N
-        ConnectionManagerPanel.add(connectionMode1, java.awt.BorderLayout.PAGE_START);
+        ConnectionModePanel.add(connectionMode1);
+
+        ConnectionManagerPanel.add(ConnectionModePanel, java.awt.BorderLayout.PAGE_START);
+
+        ConnectionParamsPanel.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        ConnectionParamsPanel.setMaximumSize(new java.awt.Dimension(0, 0));
+        ConnectionParamsPanel.setMinimumSize(new java.awt.Dimension(192, 50));
+        ConnectionParamsPanel.setPreferredSize(new java.awt.Dimension(192, 211));
 
         ConnectionParamPanel.setLayout(new java.awt.CardLayout());
 
@@ -251,40 +306,208 @@ public void savePersistValues() {
         tCPClientConPropView1.setName("TCPClient"); // NOI18N
         ConnectionParamPanel.add(tCPClientConPropView1, "card3");
 
-        ConnectionManagerPanel.add(ConnectionParamPanel, java.awt.BorderLayout.CENTER);
+        tCPServerConPropView1.setAlignmentY(1.0F);
+        ConnectionParamPanel.add(tCPServerConPropView1, "card4");
 
-        getContentPane().add(ConnectionManagerPanel, java.awt.BorderLayout.WEST);
+        ConnectionParamsPanel.add(ConnectionParamPanel);
 
-        WorkAreaPanel.setLayout(new java.awt.BorderLayout());
+        ConnectionManagerPanel.add(ConnectionParamsPanel, java.awt.BorderLayout.CENTER);
+
+        LogoPanel.setMinimumSize(new java.awt.Dimension(100, 100));
+        LogoPanel.setPreferredSize(new java.awt.Dimension(100, 200));
+
+        logoLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        logoLabel.setOpaque(true);
+        logoLabel.setPreferredSize(new java.awt.Dimension(200, 200));
+        logoLabel.setVerticalTextPosition(javax.swing.SwingConstants.TOP);
+        LogoPanel.add(logoLabel);
+
+        ConnectionManagerPanel.add(LogoPanel, java.awt.BorderLayout.SOUTH);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        getContentPane().add(ConnectionManagerPanel, gridBagConstraints);
+
+        WorkAreaPanel.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
 
         GeneralTab.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
-        GeneralTab.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+        GeneralTab.setLayout(new java.awt.GridBagLayout());
 
-        jPanel1SendArea.setBorder(javax.swing.BorderFactory.createTitledBorder("Send"));
-        jPanel1SendArea.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+        HexNormalViewHolder.setAlignmentY(0.0F);
+        HexNormalViewHolder.setMinimumSize(new java.awt.Dimension(953, 448));
+        HexNormalViewHolder.setName("HexNormalViews"); // NOI18N
+        HexNormalViewHolder.addTab("Ascii", textAreaInputText);
+        HexNormalViewHolder.addTab("Hex", hexView1);
+        HexNormalViewHolder.addTab("CommandExec", commandProgExecPanel2);
 
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        GeneralTab.add(HexNormalViewHolder, gridBagConstraints);
+        HexNormalViewHolder.getAccessibleContext().setAccessibleName("HexView");
+        HexNormalViewHolder.getAccessibleContext().setAccessibleDescription("");
+
+        SaveNDisplayOptionPanel.setAutoscrolls(true);
+        SaveNDisplayOptionPanel.setPreferredSize(new java.awt.Dimension(1144, 90));
+        SaveNDisplayOptionPanel.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+
+        SaveToFilePanel.setBorder(javax.swing.BorderFactory.createTitledBorder("SaveToFile  "));
+        SaveToFilePanel.setMinimumSize(new java.awt.Dimension(750, 80));
+        SaveToFilePanel.setOpaque(false);
+        SaveToFilePanel.setPreferredSize(new java.awt.Dimension(750, 80));
+        SaveToFilePanel.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 2));
+
+        textSelectedFolder.setEditable(false);
+        textSelectedFolder.setName("textSaveDir"); // NOI18N
+        textSelectedFolder.setPreferredSize(new java.awt.Dimension(320, 22));
+        textSelectedFolder.setRequestFocusEnabled(false);
+        textSelectedFolder.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                textSelectedFolderActionPerformed(evt);
+            }
+        });
+        SaveToFilePanel.add(textSelectedFolder);
+
+        buttonSelectDir.setText("Select Directory");
+        buttonSelectDir.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        buttonSelectDir.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
+        buttonSelectDir.setName("buttonSelectDir"); // NOI18N
+        buttonSelectDir.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonSelectDirActionPerformed(evt);
+            }
+        });
+        SaveToFilePanel.add(buttonSelectDir);
+
+        checkSaveToFile.setText("Enable");
+        checkSaveToFile.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        checkSaveToFile.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                checkSaveToFileActionPerformed(evt);
+            }
+        });
+        SaveToFilePanel.add(checkSaveToFile);
+
+        checkboxTimeStamp.setText("Add TimeStamp");
+        checkboxTimeStamp.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        checkboxTimeStamp.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                checkboxTimeStampActionPerformed(evt);
+            }
+        });
+        SaveToFilePanel.add(checkboxTimeStamp);
+
+        SaveNDisplayOptionPanel.add(SaveToFilePanel);
+
+        DisplayOptionsPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Display  "));
+
+        checkRealtimeDisplay.setSelected(true);
+        checkRealtimeDisplay.setText("RealTimeDisplay");
+        DisplayOptionsPanel.add(checkRealtimeDisplay);
+
+        checkboxEcho.setText("Local Echo");
+        DisplayOptionsPanel.add(checkboxEcho);
+
+        buttonClearText.setText("Clear");
+        buttonClearText.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonClearTextActionPerformed(evt);
+            }
+        });
+        DisplayOptionsPanel.add(buttonClearText);
+
+        jButton1.setText("Pause");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+        DisplayOptionsPanel.add(jButton1);
+
+        SaveNDisplayOptionPanel.add(DisplayOptionsPanel);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        GeneralTab.add(SaveNDisplayOptionPanel, gridBagConstraints);
+
+        CommandInputPanel.setAlignmentY(1.0F);
+        CommandInputPanel.setAutoscrolls(true);
+        CommandInputPanel.setPreferredSize(new java.awt.Dimension(1108, 210));
+        CommandInputPanel.setRequestFocusEnabled(false);
+        CommandInputPanel.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+
+        CommandInputContralArrayPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Send"));
+        CommandInputContralArrayPanel.setPreferredSize(new java.awt.Dimension(750, 200));
+        CommandInputContralArrayPanel.setLayout(new java.awt.GridBagLayout());
+
+        SendText1.setMinimumSize(new java.awt.Dimension(650, 22));
         SendText1.setName("SendText1"); // NOI18N
-        jPanel1SendArea.add(SendText1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 40, 590, 30));
+        SendText1.setPreferredSize(new java.awt.Dimension(500, 22));
+        SendText1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                SendText1ActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = java.awt.GridBagConstraints.RELATIVE;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        CommandInputContralArrayPanel.add(SendText1, gridBagConstraints);
 
         SendText2.setName("SendText2"); // NOI18N
-        jPanel1SendArea.add(SendText2, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 70, 590, 30));
+        SendText2.setPreferredSize(new java.awt.Dimension(260, 22));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridwidth = java.awt.GridBagConstraints.RELATIVE;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        CommandInputContralArrayPanel.add(SendText2, gridBagConstraints);
 
+        SendText3.setMinimumSize(new java.awt.Dimension(260, 22));
         SendText3.setName("SendText3"); // NOI18N
+        SendText3.setPreferredSize(new java.awt.Dimension(700, 22));
         SendText3.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 SendText3ActionPerformed(evt);
             }
         });
-        jPanel1SendArea.add(SendText3, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 100, 590, 30));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridwidth = java.awt.GridBagConstraints.RELATIVE;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        CommandInputContralArrayPanel.add(SendText3, gridBagConstraints);
 
         SendText4.setName("SendText4"); // NOI18N
-        jPanel1SendArea.add(SendText4, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 130, 590, 30));
+        SendText4.setPreferredSize(new java.awt.Dimension(260, 22));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 6;
+        gridBagConstraints.gridwidth = java.awt.GridBagConstraints.RELATIVE;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        CommandInputContralArrayPanel.add(SendText4, gridBagConstraints);
 
         SendText5.setName("SendText5"); // NOI18N
-        jPanel1SendArea.add(SendText5, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 160, 590, 30));
+        SendText5.setPreferredSize(new java.awt.Dimension(260, 22));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 8;
+        gridBagConstraints.gridwidth = java.awt.GridBagConstraints.RELATIVE;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        CommandInputContralArrayPanel.add(SendText5, gridBagConstraints);
 
         SendText6.setName("SendText6"); // NOI18N
-        jPanel1SendArea.add(SendText6, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 190, 590, 30));
+        SendText6.setPreferredSize(new java.awt.Dimension(260, 22));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 10;
+        gridBagConstraints.gridwidth = java.awt.GridBagConstraints.RELATIVE;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        CommandInputContralArrayPanel.add(SendText6, gridBagConstraints);
 
         SendButton1.setText("Send");
         SendButton1.addActionListener(new java.awt.event.ActionListener() {
@@ -292,7 +515,10 @@ public void savePersistValues() {
                 SendButton1ActionPerformed(evt);
             }
         });
-        jPanel1SendArea.add(SendButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(620, 40, -1, 30));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 0;
+        CommandInputContralArrayPanel.add(SendButton1, gridBagConstraints);
 
         SendButton2.setText("Send");
         SendButton2.addActionListener(new java.awt.event.ActionListener() {
@@ -300,7 +526,10 @@ public void savePersistValues() {
                 SendButton2ActionPerformed(evt);
             }
         });
-        jPanel1SendArea.add(SendButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(620, 70, -1, 30));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 2;
+        CommandInputContralArrayPanel.add(SendButton2, gridBagConstraints);
 
         SendButton3.setText("Send");
         SendButton3.addActionListener(new java.awt.event.ActionListener() {
@@ -308,7 +537,10 @@ public void savePersistValues() {
                 SendButton3ActionPerformed(evt);
             }
         });
-        jPanel1SendArea.add(SendButton3, new org.netbeans.lib.awtextra.AbsoluteConstraints(620, 100, -1, 30));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 4;
+        CommandInputContralArrayPanel.add(SendButton3, gridBagConstraints);
 
         SendButton4.setText("Send");
         SendButton4.setToolTipText("");
@@ -317,7 +549,10 @@ public void savePersistValues() {
                 SendButton4ActionPerformed(evt);
             }
         });
-        jPanel1SendArea.add(SendButton4, new org.netbeans.lib.awtextra.AbsoluteConstraints(620, 130, -1, 30));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 6;
+        CommandInputContralArrayPanel.add(SendButton4, gridBagConstraints);
 
         SendButton5.setText("Send");
         SendButton5.addActionListener(new java.awt.event.ActionListener() {
@@ -325,7 +560,10 @@ public void savePersistValues() {
                 SendButton5ActionPerformed(evt);
             }
         });
-        jPanel1SendArea.add(SendButton5, new org.netbeans.lib.awtextra.AbsoluteConstraints(620, 160, -1, 30));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 8;
+        CommandInputContralArrayPanel.add(SendButton5, gridBagConstraints);
 
         SendButton6.setText("Send");
         SendButton6.addActionListener(new java.awt.event.ActionListener() {
@@ -333,88 +571,23 @@ public void savePersistValues() {
                 SendButton6ActionPerformed(evt);
             }
         });
-        jPanel1SendArea.add(SendButton6, new org.netbeans.lib.awtextra.AbsoluteConstraints(620, 190, -1, 30));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 10;
+        CommandInputContralArrayPanel.add(SendButton6, gridBagConstraints);
 
-        GeneralTab.add(jPanel1SendArea, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 560, 710, 230));
+        CommandInputPanel.add(CommandInputContralArrayPanel);
 
-        HexNormalViewHolder.setName("HexNormalViews"); // NOI18N
-        HexNormalViewHolder.addTab("Ascii", textAreaInputText);
-        HexNormalViewHolder.addTab("Hex", hexView1);
-
-        GeneralTab.add(HexNormalViewHolder, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 1170, 470));
-        HexNormalViewHolder.getAccessibleContext().setAccessibleName("HexView");
-        HexNormalViewHolder.getAccessibleContext().setAccessibleDescription("");
-
-        SaveToFilePanel.setBorder(javax.swing.BorderFactory.createTitledBorder("SaveToFile  "));
-        SaveToFilePanel.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
-
-        textSelectedFolder.setEditable(false);
-        textSelectedFolder.setName("textSaveDir"); // NOI18N
-        SaveToFilePanel.add(textSelectedFolder, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 30, 360, -1));
-
-        buttonSelectDir.setText("Select Directory");
-        buttonSelectDir.setName("buttonSelectDir"); // NOI18N
-        buttonSelectDir.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                buttonSelectDirActionPerformed(evt);
-            }
-        });
-        SaveToFilePanel.add(buttonSelectDir, new org.netbeans.lib.awtextra.AbsoluteConstraints(380, 30, -1, -1));
-
-        checkSaveToFile.setText("Enable");
-        checkSaveToFile.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                checkSaveToFileActionPerformed(evt);
-            }
-        });
-        SaveToFilePanel.add(checkSaveToFile, new org.netbeans.lib.awtextra.AbsoluteConstraints(630, 30, -1, -1));
-
-        checkboxTimeStamp.setText("Add TimeStamp");
-        checkboxTimeStamp.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                checkboxTimeStampActionPerformed(evt);
-            }
-        });
-        SaveToFilePanel.add(checkboxTimeStamp, new org.netbeans.lib.awtextra.AbsoluteConstraints(490, 30, -1, -1));
-
-        GeneralTab.add(SaveToFilePanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 480, 710, 70));
-
-        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Display  "));
-        jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
-
-        checkRealtimeDisplay.setSelected(true);
-        checkRealtimeDisplay.setText("RealTimeDisplay");
-        jPanel1.add(checkRealtimeDisplay, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 30, -1, -1));
-
-        checkboxEcho.setText("Local Echo");
-        jPanel1.add(checkboxEcho, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 30, -1, -1));
-
-        buttonClearText.setText("Clear");
-        buttonClearText.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                buttonClearTextActionPerformed(evt);
-            }
-        });
-        jPanel1.add(buttonClearText, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 30, -1, -1));
-
-        jButton1.setText("Pause");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
-            }
-        });
-        jPanel1.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(360, 30, -1, -1));
-
-        GeneralTab.add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(720, 480, 440, 70));
-
-        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Misc "));
-        jPanel2.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+        MiscPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Misc "));
+        MiscPanel.setMinimumSize(new java.awt.Dimension(370, 200));
+        MiscPanel.setPreferredSize(new java.awt.Dimension(379, 200));
+        MiscPanel.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jTextField1.setEditable(false);
-        jPanel2.add(jTextField1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 40, 240, -1));
+        MiscPanel.add(jTextField1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 40, 220, -1));
 
         jLabel1.setText("Send File");
-        jPanel2.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 20, -1, -1));
+        MiscPanel.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 20, -1, -1));
 
         jButton2.setText(":::");
         jButton2.addActionListener(new java.awt.event.ActionListener() {
@@ -422,28 +595,37 @@ public void savePersistValues() {
                 jButton2ActionPerformed(evt);
             }
         });
-        jPanel2.add(jButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 40, -1, -1));
+        MiscPanel.add(jButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(230, 40, -1, -1));
 
         jButton5.setText("Send File");
-        jPanel2.add(jButton5, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 40, 120, -1));
+        jButton5.setPreferredSize(new java.awt.Dimension(60, 25));
+        MiscPanel.add(jButton5, new org.netbeans.lib.awtextra.AbsoluteConstraints(280, 40, 90, -1));
 
         buttonOpenCommandsFile.setText("Open Command File");
-        buttonOpenCommandsFile.setActionCommand("Open Command File");
         buttonOpenCommandsFile.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 buttonOpenCommandsFileActionPerformed(evt);
             }
         });
-        jPanel2.add(buttonOpenCommandsFile, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 80, -1, 30));
+        MiscPanel.add(buttonOpenCommandsFile, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 80, -1, 30));
 
         buttonSaveCommandsToFile.setText("Save Commands");
-        jPanel2.add(buttonSaveCommandsToFile, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 120, 130, 30));
+        MiscPanel.add(buttonSaveCommandsToFile, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 120, 130, 30));
 
-        GeneralTab.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(720, 560, 440, 230));
+        CommandInputPanel.add(MiscPanel);
 
-        WorkAreaPanel.add(GeneralTab, java.awt.BorderLayout.CENTER);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        GeneralTab.add(CommandInputPanel, gridBagConstraints);
 
-        getContentPane().add(WorkAreaPanel, java.awt.BorderLayout.CENTER);
+        WorkAreaPanel.add(GeneralTab);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        getContentPane().add(WorkAreaPanel, gridBagConstraints);
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -538,7 +720,7 @@ public void savePersistValues() {
     private void buttonClearTextActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonClearTextActionPerformed
        
         textAreaInputText.setText(null);
-        hexView1.removeAll();
+        hexView1.ClearContents();
          System.gc();
     }//GEN-LAST:event_buttonClearTextActionPerformed
 
@@ -557,6 +739,14 @@ public void savePersistValues() {
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void SendText1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SendText1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_SendText1ActionPerformed
+
+    private void textSelectedFolderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_textSelectedFolderActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_textSelectedFolderActionPerformed
        enum SendMode{
         Ascii,
         Hex,
@@ -569,7 +759,7 @@ public void savePersistValues() {
         String compoName = "SendText"+buttonNum;
         JTextField sednText=new JTextField();
         JPanel sendOpPanel=null;
-        for(Component sendTextCom:jPanel1SendArea.getComponents()){
+        for(Component sendTextCom:CommandInputContralArrayPanel.getComponents()){
             try{
                 if(((JTextField)sendTextCom).getName().contains(compoName))
                 {
@@ -581,7 +771,7 @@ public void savePersistValues() {
             }
         }
          compoName = "SendOp"+buttonNum;
-         for(Component sendOpPan:jPanel1SendArea.getComponents()){
+         for(Component sendOpPan:CommandInputContralArrayPanel.getComponents()){
             try{
             if(((JPanel)sendOpPan).getName().contains(compoName))
             {
@@ -855,10 +1045,14 @@ public void savePersistValues() {
               CardLayout cardLayout =(CardLayout) ConnectionParamPanel.getLayout();
               cardLayout.show(ConnectionParamPanel, "card3");
           }
+          else if(mode== MainControler.ConnectionMode.TCPServer){
+              CardLayout cardLayout =(CardLayout) ConnectionParamPanel.getLayout();
+              cardLayout.show(ConnectionParamPanel, "card4");
+          }
         }
 
         @Override
-        public void onEvent(MainControler.ConEvents event, Object param) {
+        public void onEvent(MainControler.ConEvents event, Object param, Object source) {
             if(event == ConEvents.Connected) textAreaInputText.append((String)param);
              else if(event == ConEvents.ConFailed)  textAreaInputText.append((String)param);
              else if(event == ConEvents.ConClosed)  textAreaInputText.append((String)param); 
@@ -877,10 +1071,18 @@ public void savePersistValues() {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JPanel CommandInputContralArrayPanel;
+    private javax.swing.JPanel CommandInputPanel;
     private javax.swing.JPanel ConnectionManagerPanel;
+    private javax.swing.JPanel ConnectionModePanel;
     private javax.swing.JPanel ConnectionParamPanel;
+    private javax.swing.JPanel ConnectionParamsPanel;
+    private javax.swing.JPanel DisplayOptionsPanel;
     private javax.swing.JPanel GeneralTab;
     private javax.swing.JTabbedPane HexNormalViewHolder;
+    private javax.swing.JPanel LogoPanel;
+    private javax.swing.JPanel MiscPanel;
+    private javax.swing.JPanel SaveNDisplayOptionPanel;
     private javax.swing.JPanel SaveToFilePanel;
     private javax.swing.JButton SendButton1;
     private javax.swing.JButton SendButton2;
@@ -909,18 +1111,18 @@ public void savePersistValues() {
     private javax.swing.JCheckBox checkSaveToFile;
     private javax.swing.JCheckBox checkboxEcho;
     private javax.swing.JCheckBox checkboxTimeStamp;
+    private com.bmjo.hackbug.ui.CommandProgExecPanel commandProgExecPanel2;
     private com.bmjo.hackbug.ui.ConnectionModeView connectionMode1;
     private com.bmjo.hackbug.ui.HexView hexView1;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton5;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel1SendArea;
-    private javax.swing.JPanel jPanel2;
     private javax.swing.JTextField jTextField1;
+    private javax.swing.JLabel logoLabel;
     private com.bmjo.hackbug.ui.SerialPortConPropView serialPortConPropSel1;
     private com.bmjo.hackbug.ui.TCPClientConPropView tCPClientConPropView1;
+    private com.bmjo.hackbug.ui.TCPServerConPropView tCPServerConPropView1;
     private java.awt.TextArea textAreaInputText;
     private javax.swing.JTextField textSelectedFolder;
     // End of variables declaration//GEN-END:variables

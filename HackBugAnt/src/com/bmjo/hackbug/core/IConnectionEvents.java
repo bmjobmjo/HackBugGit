@@ -13,7 +13,7 @@ import com.bmjo.hackbug.core.MainControler.Error;
  */
 public interface IConnectionEvents {
      public void onReceive(byte [] data, int numBytes,IConnection eventSource,Object eventInfo);
-     public void onEvent(ConEvents event,Object param);
+     public void onEvent(ConEvents event,Object param,Object source);
      public void onError(Error error, Object details);
      public void onConnectionModeChange(ConnectionMode mode);
      public void onSelectedConChange(IConnection connection);

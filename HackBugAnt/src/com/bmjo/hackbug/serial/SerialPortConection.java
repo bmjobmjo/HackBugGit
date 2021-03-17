@@ -69,19 +69,19 @@ public class SerialPortConection  implements IConnection{
                 port.setComPortTimeouts(SerialPort.TIMEOUT_READ_SEMI_BLOCKING, 100, 100);
                 ++CommonDataArea.conCount;
                 conName = conParams.port+":"+CommonDataArea.conCount;
-                MainControler.fireConEvent(MainControler.ConEvents.Connected, "Serial port "+port.getSystemPortName()+ " Opened\r\n");
+                MainControler.fireConEvent(MainControler.ConEvents.Connected, "Serial port "+port.getSystemPortName()+ " Opened\r\n",this);
                 
                  running = true;
                  threadReader = new Thread(new ReadSerialData());
                  threadReader.start();
                  return true;
             }else {
-                MainControler.fireConEvent(MainControler.ConEvents.ConFailed,"Failed to Open Serial port "+port.getSystemPortName()+"\r\n");
+                MainControler.fireConEvent(MainControler.ConEvents.ConFailed,"Failed to Open Serial port "+port.getSystemPortName()+"\r\n",this);
                 return false;
             }
             
         }catch(SerialPortInvalidPortException exp){
-             MainControler.fireConEvent(MainControler.ConEvents.ConFailed,"Failed to Open Serial port "+port.getSystemPortName()+"\r\n");
+             MainControler.fireConEvent(MainControler.ConEvents.ConFailed,"Failed to Open Serial port "+port.getSystemPortName()+"\r\n",this);
              return false;
         }
     }
@@ -102,7 +102,7 @@ public class SerialPortConection  implements IConnection{
             port.writeBytes(data,data.length);
             return true;
         }else {
-            MainControler.fireConEvent(MainControler.ConEvents.ConFailed,"Failed to send on serial port "+port.getSystemPortName()+"\r\n");
+            MainControler.fireConEvent(MainControler.ConEvents.ConFailed,"Failed to send on serial port "+port.getSystemPortName()+"\r\n",this);
             lastError = PORT_NOT_CONNECTED;
             lastErrorMesg = PORT_NOT_CONNECTED_MESG;
             return false;
@@ -129,7 +129,7 @@ public class SerialPortConection  implements IConnection{
             port.closePort();
             running = false;
             threadReader.join(1000);
-            MainControler.fireConEvent(MainControler.ConEvents.ConClosed,"Closed Serial Port "+port.getSystemPortName()+"\r\n");
+            MainControler.fireConEvent(MainControler.ConEvents.ConClosed,"Closed Serial Port "+port.getSystemPortName()+"\r\n",this);
             return true;
         }catch(Exception exp){
             return false;
