@@ -134,7 +134,7 @@ public class TcpConnection implements IConnection {
                     if(numBytes==-1) break;
                     MainControler.onReceive(readData, numBytes, TcpConnection.this, null);
                 }
-                MainControler.fireConEvent(MainControler.ConEvents.ConClosed, "Connnection Closed \r\n",this);
+              //  MainControler.fireConEvent(MainControler.ConEvents.ConClosed, "Connnection Closed \r\n",this);
             } catch (Exception exp) {
 
             }

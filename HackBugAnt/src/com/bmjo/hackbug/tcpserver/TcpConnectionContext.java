@@ -85,6 +85,7 @@ public class TcpConnectionContext implements IConnection {
     public boolean connect(Socket con) {
 
         try {
+            this.con = con;
             out = (OutputStream) con.getOutputStream();
             in = (InputStream) con.getInputStream();
              ReadSockData reader = new ReadSockData();
@@ -136,6 +137,9 @@ public class TcpConnectionContext implements IConnection {
     @Override
     public boolean close() {
         try {
+            
+            out.close();
+            in.close();
             con.close();
             MainControler.fireConEvent(MainControler.ConEvents.ConClosed,"Connnection Closed \r\n",this);
 
@@ -159,9 +163,9 @@ public class TcpConnectionContext implements IConnection {
                     if(numBytes==-1) break;
                     MainControler.onReceive(readData, numBytes, TcpConnectionContext.this, null);
                 }
-                MainControler.fireConEvent(MainControler.ConEvents.ConClosed, "Connnection Closed \r\n",parent);
+              //  MainControler.fireConEvent(MainControler.ConEvents.ConClosed, "Connnection Closed \r\n",parent);
             } catch (Exception exp) {
-                MainControler.fireConEvent(MainControler.ConEvents.ConClosed, "Connnection Closed \r\n",parent);
+              //  MainControler.fireConEvent(MainControler.ConEvents.ConClosed, "Connnection Closed \r\n",parent);
             }
         }
     }

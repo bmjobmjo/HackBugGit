@@ -27,6 +27,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.URISyntaxException;
@@ -190,6 +191,7 @@ public void savePersistValues() {
                 }
             }
            
+           
         } catch (FileNotFoundException ex) {
             Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
              JOptionPane.showMessageDialog(this, "Error Saving Persist Values.", ex.getMessage(),JOptionPane.WARNING_MESSAGE);
@@ -263,12 +265,10 @@ public void savePersistValues() {
         SendButton5 = new javax.swing.JButton();
         SendButton6 = new javax.swing.JButton();
         MiscPanel = new javax.swing.JPanel();
-        jTextField1 = new javax.swing.JTextField();
+        textSelectedFileForSend = new javax.swing.JTextField();
         jLabel1 = new javax.swing.JLabel();
-        jButton2 = new javax.swing.JButton();
-        jButton5 = new javax.swing.JButton();
-        buttonOpenCommandsFile = new javax.swing.JButton();
-        buttonSaveCommandsToFile = new javax.swing.JButton();
+        btnChooseFileToSend = new javax.swing.JButton();
+        btnSendFile = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("HackBug");
@@ -583,34 +583,30 @@ public void savePersistValues() {
         MiscPanel.setPreferredSize(new java.awt.Dimension(379, 200));
         MiscPanel.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jTextField1.setEditable(false);
-        MiscPanel.add(jTextField1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 40, 220, -1));
+        textSelectedFileForSend.setEditable(false);
+        textSelectedFileForSend.setEnabled(false);
+        MiscPanel.add(textSelectedFileForSend, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 40, 220, -1));
 
         jLabel1.setText("Send File");
         MiscPanel.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 20, -1, -1));
 
-        jButton2.setText(":::");
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
+        btnChooseFileToSend.setText(":::");
+        btnChooseFileToSend.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
+                btnChooseFileToSendActionPerformed(evt);
             }
         });
-        MiscPanel.add(jButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(230, 40, -1, -1));
+        MiscPanel.add(btnChooseFileToSend, new org.netbeans.lib.awtextra.AbsoluteConstraints(230, 40, -1, -1));
 
-        jButton5.setText("Send File");
-        jButton5.setPreferredSize(new java.awt.Dimension(60, 25));
-        MiscPanel.add(jButton5, new org.netbeans.lib.awtextra.AbsoluteConstraints(280, 40, 90, -1));
-
-        buttonOpenCommandsFile.setText("Open Command File");
-        buttonOpenCommandsFile.addActionListener(new java.awt.event.ActionListener() {
+        btnSendFile.setText("Send File");
+        btnSendFile.setEnabled(false);
+        btnSendFile.setPreferredSize(new java.awt.Dimension(60, 25));
+        btnSendFile.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                buttonOpenCommandsFileActionPerformed(evt);
+                btnSendFileActionPerformed(evt);
             }
         });
-        MiscPanel.add(buttonOpenCommandsFile, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 80, -1, 30));
-
-        buttonSaveCommandsToFile.setText("Save Commands");
-        MiscPanel.add(buttonSaveCommandsToFile, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 120, 130, 30));
+        MiscPanel.add(btnSendFile, new org.netbeans.lib.awtextra.AbsoluteConstraints(280, 40, 90, -1));
 
         CommandInputPanel.add(MiscPanel);
 
@@ -724,21 +720,16 @@ public void savePersistValues() {
          System.gc();
     }//GEN-LAST:event_buttonClearTextActionPerformed
 
-    private void buttonOpenCommandsFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonOpenCommandsFileActionPerformed
+    private void btnChooseFileToSendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnChooseFileToSendActionPerformed
          JFileChooser fileChooser = new JFileChooser();
             fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-            FileFilter docFilter = new FileNameExtensionFilter("Commands file", "ser");
-            fileChooser.setFileFilter(docFilter);
             int option = fileChooser.showOpenDialog(this);
             if(option == JFileChooser.APPROVE_OPTION){
                File file = fileChooser.getSelectedFile();
-               textSelectedFolder.setText(file.getPath());
+               textSelectedFileForSend.setText(file.getPath());
+               btnSendFile.setEnabled(true);
             }
-    }//GEN-LAST:event_buttonOpenCommandsFileActionPerformed
-
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButton2ActionPerformed
+    }//GEN-LAST:event_btnChooseFileToSendActionPerformed
 
     private void SendText1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SendText1ActionPerformed
         // TODO add your handling code here:
@@ -747,6 +738,42 @@ public void savePersistValues() {
     private void textSelectedFolderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_textSelectedFolderActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_textSelectedFolderActionPerformed
+
+    private void btnSendFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSendFileActionPerformed
+        // TODO add your handling code here:
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try{
+                 byte [] dat = new byte[200];
+                 long fileSize = new File(textSelectedFileForSend.getText()).length();
+                 int lastPack =(int) fileSize%200;
+                 long pos=0;
+                 
+                 InputStream inputStream = new FileInputStream(textSelectedFileForSend.getText());
+                 while(pos<fileSize){
+                     textAreaInputText.append("Sending packet - "+pos+"\r\n");
+                     inputStream.read(dat);
+                     CommonDataArea.connection.send(dat);
+                     pos+=200;
+                     
+                 }
+               
+                if(lastPack>0){
+                    byte [] lastBytes = new byte[lastPack];
+                    inputStream.read(lastBytes);
+                    CommonDataArea.connection.send(lastBytes);
+                }
+                
+                inputStream.close();
+                 
+                }catch(Exception exp){
+                    
+                }
+            }
+        });
+        thread.start();
+    }//GEN-LAST:event_btnSendFileActionPerformed
        enum SendMode{
         Ascii,
         Hex,
@@ -1097,6 +1124,8 @@ public void savePersistValues() {
     private javax.swing.JTextField SendText5;
     private javax.swing.JTextField SendText6;
     private javax.swing.JPanel WorkAreaPanel;
+    private javax.swing.JButton btnChooseFileToSend;
+    private javax.swing.JButton btnSendFile;
     private javax.swing.JButton buttonClearText;
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.ButtonGroup buttonGroup2;
@@ -1104,8 +1133,6 @@ public void savePersistValues() {
     private javax.swing.ButtonGroup buttonGroup4;
     private javax.swing.ButtonGroup buttonGroup5;
     private javax.swing.ButtonGroup buttonGroup6;
-    private javax.swing.JButton buttonOpenCommandsFile;
-    private javax.swing.JButton buttonSaveCommandsToFile;
     private javax.swing.JButton buttonSelectDir;
     private javax.swing.JCheckBox checkRealtimeDisplay;
     private javax.swing.JCheckBox checkSaveToFile;
@@ -1115,15 +1142,13 @@ public void savePersistValues() {
     private com.bmjo.hackbug.ui.ConnectionModeView connectionMode1;
     private com.bmjo.hackbug.ui.HexView hexView1;
     private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton5;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JTextField jTextField1;
     private javax.swing.JLabel logoLabel;
     private com.bmjo.hackbug.ui.SerialPortConPropView serialPortConPropSel1;
     private com.bmjo.hackbug.ui.TCPClientConPropView tCPClientConPropView1;
     private com.bmjo.hackbug.ui.TCPServerConPropView tCPServerConPropView1;
     private java.awt.TextArea textAreaInputText;
+    private javax.swing.JTextField textSelectedFileForSend;
     private javax.swing.JTextField textSelectedFolder;
     // End of variables declaration//GEN-END:variables
 }

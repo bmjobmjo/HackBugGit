@@ -32,9 +32,12 @@
           <Properties>
             <Property name="columns" type="int" value="20"/>
             <Property name="rows" type="int" value="5"/>
-            <Property name="text" type="java.lang.String" value="waitsec 1&#xa;:label label1&#xa;waitmany &quot;bmjo&quot; &quot;iorbit&quot; &quot;test&quot;&#xa;case 0&#xa;Send &quot;bmjo received&quot;&#xa;goto exitlab&#xa;case 1&#xa;Send &quot;iOrbit received&quot;&#xa;goto exitlab&#xa;case 2&#xa;Send &quot;test received&quot;&#xa;goto exitlab&#xa;default&#xa;Send &quot;wrong option received&quot;&#xa;:label exitlab&#xa;goto label1&#xa;END&#xa;&#xa;&#xa;"/>
+            <Property name="text" type="java.lang.String" value="&#xa;"/>
             <Property name="toolTipText" type="java.lang.String" value=""/>
           </Properties>
+          <Events>
+            <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="textCommandProgFocusLost"/>
+          </Events>
         </Component>
       </SubComponents>
     </Container>
@@ -54,6 +57,7 @@
                       <Component id="buttonLoadCommandFile" alignment="0" max="32767" attributes="0"/>
                       <Component id="buttonExecCommand" alignment="0" max="32767" attributes="0"/>
                       <Component id="buttonStopExec" max="32767" attributes="0"/>
+                      <Component id="buttonSaveFile" pref="0" max="32767" attributes="0"/>
                   </Group>
                   <EmptySpace pref="30" max="32767" attributes="0"/>
               </Group>
@@ -68,7 +72,9 @@
                   <Component id="buttonExecCommand" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="buttonStopExec" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace pref="141" max="32767" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Component id="buttonSaveFile" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace pref="110" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -78,6 +84,9 @@
           <Properties>
             <Property name="text" type="java.lang.String" value="Load"/>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="buttonLoadCommandFileActionPerformed"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JButton" name="buttonExecCommand">
           <Properties>
@@ -93,6 +102,14 @@
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="buttonStopExecActionPerformed"/>
+          </Events>
+        </Component>
+        <Component class="javax.swing.JButton" name="buttonSaveFile">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Save"/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="buttonSaveFileActionPerformed"/>
           </Events>
         </Component>
       </SubComponents>

@@ -7,6 +7,26 @@ package com.bmjo.hackbug.ui;
 
 import com.bmjo.hackbug.core.CommandExecStatus;
 import com.bmjo.hackbug.core.CommandInterpretor;
+import static com.sun.java.accessibility.util.AWTEventMonitor.addWindowListener;
+import java.awt.Component;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.URISyntaxException;
+import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.JTextField;
 
 /**
  *
@@ -15,11 +35,22 @@ import com.bmjo.hackbug.core.CommandInterpretor;
 public class CommandProgExecPanel extends javax.swing.JPanel implements CommandExecStatus {
 
     CommandInterpretor interpretor;
+
     /**
      * Creates new form CommandProgExecPanel
      */
     public CommandProgExecPanel() {
         initComponents();
+        loadPerstValues();
+        addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent e) {
+
+            }
+        });
+    }
+
+    protected void finalize() {
+        savePersistValues();
     }
 
     /**
@@ -37,6 +68,7 @@ public class CommandProgExecPanel extends javax.swing.JPanel implements CommandE
         buttonLoadCommandFile = new javax.swing.JButton();
         buttonExecCommand = new javax.swing.JButton();
         buttonStopExec = new javax.swing.JButton();
+        buttonSaveFile = new javax.swing.JButton();
         jScrollPane2 = new javax.swing.JScrollPane();
         txtCommandExecStatus = new javax.swing.JTextArea();
 
@@ -44,13 +76,23 @@ public class CommandProgExecPanel extends javax.swing.JPanel implements CommandE
 
         textCommandProg.setColumns(20);
         textCommandProg.setRows(5);
-        textCommandProg.setText("waitsec 1\n:label label1\nwaitmany \"bmjo\" \"iorbit\" \"test\"\ncase 0\nSend \"bmjo received\"\ngoto exitlab\ncase 1\nSend \"iOrbit received\"\ngoto exitlab\ncase 2\nSend \"test received\"\ngoto exitlab\ndefault\nSend \"wrong option received\"\n:label exitlab\ngoto label1\nEND\n\n\n");
+        textCommandProg.setText("\n");
         textCommandProg.setToolTipText("");
+        textCommandProg.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                textCommandProgFocusLost(evt);
+            }
+        });
         jScrollPane1.setViewportView(textCommandProg);
 
         add(jScrollPane1, java.awt.BorderLayout.CENTER);
 
         buttonLoadCommandFile.setText("Load");
+        buttonLoadCommandFile.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonLoadCommandFileActionPerformed(evt);
+            }
+        });
 
         buttonExecCommand.setText("Exec");
         buttonExecCommand.addActionListener(new java.awt.event.ActionListener() {
@@ -66,6 +108,13 @@ public class CommandProgExecPanel extends javax.swing.JPanel implements CommandE
             }
         });
 
+        buttonSaveFile.setText("Save");
+        buttonSaveFile.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonSaveFileActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -75,7 +124,8 @@ public class CommandProgExecPanel extends javax.swing.JPanel implements CommandE
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(buttonLoadCommandFile, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(buttonExecCommand, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(buttonStopExec, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(buttonStopExec, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(buttonSaveFile, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
                 .addContainerGap(30, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
@@ -87,7 +137,9 @@ public class CommandProgExecPanel extends javax.swing.JPanel implements CommandE
                 .addComponent(buttonExecCommand)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(buttonStopExec)
-                .addContainerGap(141, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(buttonSaveFile)
+                .addContainerGap(110, Short.MAX_VALUE))
         );
 
         add(jPanel1, java.awt.BorderLayout.LINE_END);
@@ -105,18 +157,153 @@ public class CommandProgExecPanel extends javax.swing.JPanel implements CommandE
         String script = textCommandProg.getText();
         interpretor.addStatusListner(this);
         interpretor.Execute(script);
-        
+
     }//GEN-LAST:event_buttonExecCommandActionPerformed
 
     private void buttonStopExecActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonStopExecActionPerformed
         // TODO add your handling code here:
-        if(interpretor!=null) interpretor.Stop();
+        if (interpretor != null)
+            interpretor.Stop();
     }//GEN-LAST:event_buttonStopExecActionPerformed
+
+    public void loadPerstValues() {
+        ObjectInputStream objectinputstream = null;
+        try {
+            String jarPath = "excpetion";
+            try {
+                jarPath = MainForm.class
+                        .getProtectionDomain()
+                        .getCodeSource()
+                        .getLocation()
+                        .toURI()
+                        .getPath();
+            } catch (URISyntaxException ex) {
+                Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+            String filePath = jarPath;
+            filePath = filePath.substring(0, filePath.lastIndexOf("/")) + "/lastscript.scr";
+            FileInputStream streamIn = new FileInputStream(filePath);
+            objectinputstream = new ObjectInputStream(streamIn);
+
+            String persVal = (String) objectinputstream.readObject();
+            textCommandProg.setText(persVal);
+            if (objectinputstream != null) {
+                objectinputstream.close();
+            }
+        } catch (Exception e) {
+            Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, e);
+            // JOptionPane.showMessageDialog(this, "Error Loading Persist Values.", e.getMessage(),JOptionPane.WARNING_MESSAGE);
+        } finally {
+
+        }
+    }
+
+    public void savePersistValues() {
+        FileOutputStream fout = null;
+        try {
+            String jarPath = "excpetion";
+            try {
+                jarPath = MainForm.class
+                        .getProtectionDomain()
+                        .getCodeSource()
+                        .getLocation()
+                        .toURI()
+                        .getPath();
+            } catch (URISyntaxException ex) {
+                Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+            String filePath = jarPath;
+
+            filePath = filePath.substring(0, filePath.lastIndexOf("/")) + "/lastscript.scr";
+            // JOptionPane.showMessageDialog(this, filePath,"File Ptah",JOptionPane.WARNING_MESSAGE);
+
+            fout = new FileOutputStream(filePath);
+            ObjectOutputStream oos;
+            oos = new ObjectOutputStream(fout);
+
+            oos.writeObject(textCommandProg.getText());
+            oos.close();
+
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
+            // JOptionPane.showMessageDialog(this, "Error Saving Persist Values.", ex.getMessage(),JOptionPane.WARNING_MESSAGE);
+        } catch (IOException ex) {
+            Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
+            // JOptionPane.showMessageDialog(this, "Error Loading Saving Values.", ex.getMessage(),JOptionPane.WARNING_MESSAGE);
+        } finally {
+            try {
+                fout.close();
+            } catch (IOException ex) {
+                Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
+                //JOptionPane.showMessageDialog(this, "Error Saving Persist Values.", ex.getMessage(),JOptionPane.WARNING_MESSAGE);
+            }
+        }
+    }
+
+    private void buttonLoadCommandFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonLoadCommandFileActionPerformed
+        // TODO add your handling code here:
+        JFileChooser fileChooser = new JFileChooser();
+        // fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
+        int result = fileChooser.showOpenDialog(this);
+        if (result == JFileChooser.APPROVE_OPTION) {
+            File selectedFile = fileChooser.getSelectedFile();
+            System.out.println("Selected file: " + selectedFile.getAbsolutePath());
+            try {
+                // File myObj = new File(selectedFile);
+                Scanner myReader = new Scanner(selectedFile);
+                String data = "";
+                while (myReader.hasNextLine()) {
+                    data += (myReader.nextLine() + "\r\n");
+                    System.out.println(data);
+                }
+                myReader.close();
+                textCommandProg.setText(data);
+                savePersistValues();
+            } catch (FileNotFoundException e) {
+                System.out.println("An error occurred.");
+                e.printStackTrace();
+            }
+        }
+    }//GEN-LAST:event_buttonLoadCommandFileActionPerformed
+
+    private void buttonSaveFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonSaveFileActionPerformed
+        // TODO add your handling code here:
+        JFrame parentFrame = new JFrame();
+
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Specify a file to save");
+
+        int userSelection = fileChooser.showSaveDialog(parentFrame);
+        File fileToSave = null;
+        if (userSelection == JFileChooser.APPROVE_OPTION) {
+            fileToSave = fileChooser.getSelectedFile();
+            System.out.println("Save as file: " + fileToSave.getAbsolutePath());
+        }
+        if (fileToSave == null) {
+            return;
+        }
+        try {
+            FileWriter writer = new FileWriter(fileToSave);
+            writer.write(textCommandProg.getText());
+            writer.close();
+            savePersistValues();
+        } catch (Exception exp) {
+
+        }
+    }//GEN-LAST:event_buttonSaveFileActionPerformed
+
+    private void textCommandProgFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_textCommandProgFocusLost
+        // TODO add your handling code here:
+        savePersistValues();
+    }//GEN-LAST:event_textCommandProgFocusLost
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton buttonExecCommand;
     private javax.swing.JButton buttonLoadCommandFile;
+    private javax.swing.JButton buttonSaveFile;
     private javax.swing.JButton buttonStopExec;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
@@ -127,16 +314,16 @@ public class CommandProgExecPanel extends javax.swing.JPanel implements CommandE
 
     @Override
     public void CommandExecStatus(String command, String status) {
-       String statusStr = command+" : "+status+"\r\n";
-      txtCommandExecStatus.append(statusStr);    
-      
-      txtCommandExecStatus.setCaretPosition(txtCommandExecStatus.getText().length());
+        String statusStr = command + " : " + status + "\r\n";
+        txtCommandExecStatus.append(statusStr);
+
+        txtCommandExecStatus.setCaretPosition(txtCommandExecStatus.getText().length());
     }
 
     @Override
     public void CommandParseStatus(String command, String status) {
-      String statusStr = command+" : "+status+"\r\n";
-      txtCommandExecStatus.append(statusStr);
-       txtCommandExecStatus.setCaretPosition(txtCommandExecStatus.getText().length());
+        String statusStr = command + " : " + status + "\r\n";
+        txtCommandExecStatus.append(statusStr);
+        txtCommandExecStatus.setCaretPosition(txtCommandExecStatus.getText().length());
     }
 }

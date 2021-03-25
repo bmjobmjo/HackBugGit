@@ -92,6 +92,7 @@ public class TcpServer implements IConnection{
             for (TcpConnectionContext conCon : conList) {
                 conCon.close();
             }
+            conList.clear();
         } catch (Exception exp) {
             return false;
         }
