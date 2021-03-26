@@ -1,0 +1,5 @@
+[{ "cmd": "waitsec", "params":1},{ "cmd": "waitmilli", "params":1},{ "cmd": "send", "params":1},{ "cmd": "goto", "params":1},{ "cmd": ":label", "params":1},
+    { "cmd": "waitfor", "params":1},{ "cmd": "waitmany", "params":100},{ "cmd": "case", "params":1},{ "cmd": "end", "params":0},{ "cmd": "default", "params":0}
+    ,{ "cmd": "recvbuffer", "params":1}
+]
+

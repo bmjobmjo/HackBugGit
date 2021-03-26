@@ -6,9 +6,19 @@
 package com.bmjo.hackbug.core;
 
 import java.io.Console;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 
 /**
  *
@@ -45,7 +55,13 @@ public class CommandInterpretor implements IConnectionEvents {
     // byte[] recvdArray = new  byte[waitForbufSize]
     Stack<Byte> recvdBytes = new Stack<Byte>();
     WaitForStringInfo foundStr;
-
+    enum ScriptErrorType{
+            NoError,
+            EndOfFile,
+            TokenError
+        };
+    ScriptErrorType scriptError;
+    JSONArray commandsJson;
     @Override
     public void onReceive(byte[] data, int numBytes, IConnection eventSource, Object eventInfo) {
         //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
@@ -168,22 +184,29 @@ public class CommandInterpretor implements IConnectionEvents {
         public void run() {
             try {
                 sendError("Script", "Parsing script");
+                CommandListReader();
                 while (getNextCommandTokens()) {
                     CommandStepInfo nextStep = new CommandStepInfo();
                     nextStep.startPointer = curState.nextPointer;
                     curState = nextStep;
                 }
-                sendError("Script", "Executing script");
-                ExecuteCommand();
+                if(scriptError==ScriptErrorType.EndOfFile){
+                      sendError("Script", "Executing script");
+                      ExecuteCommand();
+                }else {
+                 sendError("Script", "Error in script, Execution aborted");
+                }
+              
             } catch (Exception exp) {
                 sendError("Coomand Parsing", exp.getMessage());
             }
         }
 
         boolean ExecuteCommand() {
+            CommandStepInfo cmd = null;
             try {
                 int instructionPtr = 0;
-                CommandStepInfo cmd = null;
+               
                 while (commandList.size() > instructionPtr) {
                     if (stopExec) {
                         break;
@@ -306,7 +329,7 @@ public class CommandInterpretor implements IConnectionEvents {
                     ++instructionPtr;
                 }
             } catch (Exception exp) {
-                sendStatus(CMD_SEND, exp.getMessage());
+                sendStatus(cmd.commandPart, exp.getMessage());
             }
             return true;
         }
@@ -373,6 +396,42 @@ public class CommandInterpretor implements IConnectionEvents {
             }
             return -1;
         }
+        
+        void CommandListReader()
+        {
+             JSONParser jsonParser = new JSONParser();
+          String fileName = ClassLoader.getSystemResource("res/scriptcommands.json").getFile();
+        try (FileReader reader = new FileReader(fileName))
+        {
+            //Read JSON file
+            Object obj = jsonParser.parse(reader);
+ 
+            commandsJson = (JSONArray) obj;
+            System.out.println(commandsJson);
+             
+         
+ 
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }   catch (org.json.simple.parser.ParseException ex) { 
+                Logger.getLogger(CommandInterpretor.class.getName()).log(Level.SEVERE, null, ex);
+            } 
+        }
+        
+        int checkValidCommand(String command){
+            for(Object obj : commandsJson){
+                JSONObject commandInfo = (JSONObject)obj;
+                String commandFound =(String) commandInfo.get("cmd");
+                if(commandFound.equals(command)){
+                  long paramsL = (long)  commandInfo.get("params");
+                 // int paramNum = Integer.parseInt(paramsStr);
+                  return (int)paramsL;
+                }
+            }
+            return -1;
+        }
 
         boolean splitToTokens(String command) {
             int length = command.length();
@@ -384,6 +443,8 @@ public class CommandInterpretor implements IConnectionEvents {
                     return false;
                 }
             }
+           
+           
             int indexSpace = command.indexOf(' ', index);
             if (indexSpace == -1) {
                 indexSpace = command.indexOf(index, '\r');
@@ -391,14 +452,20 @@ public class CommandInterpretor implements IConnectionEvents {
             if (indexSpace == -1) {
                 indexSpace = command.indexOf(index, '\n');
             }
-            if (indexSpace == -1) {
-                curState.commandPart = command.substring(index, length);
-                curState.commandPart = curState.commandPart.toLowerCase();
-                return true;
-            }
-
-            curState.commandPart = command.substring(index, indexSpace);
+            if (indexSpace !=-1) length = indexSpace-index;
+            
+            curState.commandPart = command.substring(index, length);
             curState.commandPart = curState.commandPart.toLowerCase();
+            int paramNum = checkValidCommand(curState.commandPart);
+            if(paramNum==-1){
+                 sendError("Line Number -"+lineNumber, "Invalid command");
+                 return false;
+            }
+            if (indexSpace == -1) { 
+                sendError("Line Number -"+lineNumber, "Parameter not found");
+                if(paramNum==0) return true;else return false;
+            }
+            length = command.length();
             while (true) {
                 ++indexSpace;
                 if (indexSpace >= length) {
@@ -443,12 +510,15 @@ public class CommandInterpretor implements IConnectionEvents {
         }
 
         int lineNumber =0;
+        
+        
         boolean getNextCommandTokens() {
             //curState.startPointer = curState.nextPointer;
             ++lineNumber;
             int endTokenIndex = script.indexOf("\n", curState.startPointer);
             if (endTokenIndex == -1) {
-                sendError("Line Number -"+lineNumber, "end of line not found\r\n");
+                sendError("Line Number -"+lineNumber, "end of script reached\r\n");
+                scriptError = ScriptErrorType.EndOfFile;
                 return false;
             }
             String command = script.substring(curState.startPointer, endTokenIndex);
@@ -462,6 +532,7 @@ public class CommandInterpretor implements IConnectionEvents {
                 return true;
             } else {
                 sendError("Line Number -"+lineNumber, "Token generation failed for command -"+command+"\r\n");
+                scriptError = ScriptErrorType.TokenError;
                 return false;
             }
         }
