@@ -717,7 +717,6 @@ public void savePersistValues() {
        
         textAreaInputText.setText(null);
         hexView1.ClearContents();
-        commandProgExecPanel2.ClearCommandLog();
          System.gc();
     }//GEN-LAST:event_buttonClearTextActionPerformed
 
@@ -851,36 +850,32 @@ public void savePersistValues() {
                               JOptionPane.WARNING_MESSAGE);
         }
     }
-   
     //all escape charectors to support
     //https://en.wikipedia.org/wiki/Escape_sequences_in_C
     byte[] convertToAscii(String inputString){
-        if(inputString.contains("//")){ //checking for comment
+        if(inputString.contains("//")){
             inputString = inputString.substring(0, inputString.indexOf("//"));
         }
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream( );
         boolean escFound = false;
         boolean hexExtract = false;
         String hexBytes="";
-        int hexCount=0;
         ArrayList<String> hexVals = new ArrayList<String>();
         try{
         for(int i=0;i<inputString.length();++i){
             if(hexExtract){
                 if((inputString.charAt(i)!=' ')&&(inputString.charAt(i)!='\\')){
                     hexBytes+=inputString.charAt(i);
-                    if(hexCount%2==1){
+                    if(i%2==1){
                         hexVals.add(hexBytes);
                         hexBytes=new String("");
                     }
-                    hexCount++;
                  }else{
                     for(String hexValStr :hexVals ){
                     int hexVal = Integer.parseInt(hexValStr, 16);
                      outputStream.write(hexVal);
                     }
                      hexExtract=false;
-                     hexVals.clear();
                 }
                 continue;
             }
@@ -901,7 +896,6 @@ public void savePersistValues() {
                     case 'x':
                         hexBytes="";
                         hexExtract=true;
-                        hexCount=0;
                         break;
                 }
                 escFound=false;
@@ -912,14 +906,6 @@ public void savePersistValues() {
             }else{
                 escFound=true;
             }
-        }
-        if(hexExtract){
-            for(String hexValStr :hexVals ){
-                    int hexVal = Integer.parseInt(hexValStr, 16);
-                     outputStream.write(hexVal);
-                    }
-                     hexExtract=false;
-                     hexVals.clear();
         }
        return outputStream.toByteArray();
         }catch(Exception exp){

@@ -69,7 +69,6 @@ public class CommandProgExecPanel extends javax.swing.JPanel implements CommandE
         buttonExecCommand = new javax.swing.JButton();
         buttonStopExec = new javax.swing.JButton();
         buttonSaveFile = new javax.swing.JButton();
-        buttonNew = new javax.swing.JButton();
         jScrollPane2 = new javax.swing.JScrollPane();
         txtCommandExecStatus = new javax.swing.JTextArea();
 
@@ -116,29 +115,18 @@ public class CommandProgExecPanel extends javax.swing.JPanel implements CommandE
             }
         });
 
-        buttonNew.setText("New ");
-        buttonNew.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                buttonNewActionPerformed(evt);
-            }
-        });
-
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(buttonLoadCommandFile, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(buttonExecCommand, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(buttonStopExec, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(buttonSaveFile, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(buttonNew, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
-                .addContainerGap())
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(buttonLoadCommandFile, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(buttonExecCommand, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(buttonStopExec, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(buttonSaveFile, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                .addContainerGap(30, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -151,9 +139,7 @@ public class CommandProgExecPanel extends javax.swing.JPanel implements CommandE
                 .addComponent(buttonStopExec)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(buttonSaveFile)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(buttonNew)
-                .addContainerGap(79, Short.MAX_VALUE))
+                .addContainerGap(110, Short.MAX_VALUE))
         );
 
         add(jPanel1, java.awt.BorderLayout.LINE_END);
@@ -174,10 +160,6 @@ public class CommandProgExecPanel extends javax.swing.JPanel implements CommandE
 
     }//GEN-LAST:event_buttonExecCommandActionPerformed
 
-    public void ClearCommandLog()
-    {
-        txtCommandExecStatus.setText("");
-    }
     private void buttonStopExecActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonStopExecActionPerformed
         // TODO add your handling code here:
         if (interpretor != null)
@@ -317,15 +299,10 @@ public class CommandProgExecPanel extends javax.swing.JPanel implements CommandE
         savePersistValues();
     }//GEN-LAST:event_textCommandProgFocusLost
 
-    private void buttonNewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonNewActionPerformed
-        textCommandProg.setText("");
-    }//GEN-LAST:event_buttonNewActionPerformed
-
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton buttonExecCommand;
     private javax.swing.JButton buttonLoadCommandFile;
-    private javax.swing.JButton buttonNew;
     private javax.swing.JButton buttonSaveFile;
     private javax.swing.JButton buttonStopExec;
     private javax.swing.JPanel jPanel1;
