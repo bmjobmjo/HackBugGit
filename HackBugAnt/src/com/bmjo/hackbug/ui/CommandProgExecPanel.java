@@ -34,7 +34,7 @@ import javax.swing.JTextField;
  */
 public class CommandProgExecPanel extends javax.swing.JPanel implements CommandExecStatus {
 
-    CommandInterpretor interpretor;
+    CommandInterpretor interpretor=null;
 
     /**
      * Creates new form CommandProgExecPanel
@@ -167,10 +167,18 @@ public class CommandProgExecPanel extends javax.swing.JPanel implements CommandE
 
     private void buttonExecCommandActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonExecCommandActionPerformed
         // TODO add your handling code here:
+        if(interpretor==null){
         interpretor = new CommandInterpretor();
         String script = textCommandProg.getText();
         interpretor.addStatusListner(this);
         interpretor.Execute(script);
+        }else {
+            interpretor.Stop();
+             interpretor = new CommandInterpretor();
+            String script = textCommandProg.getText();
+            interpretor.addStatusListner(this);
+            interpretor.Execute(script);
+        }
 
     }//GEN-LAST:event_buttonExecCommandActionPerformed
 

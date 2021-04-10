@@ -425,9 +425,9 @@ public class CommandInterpretor implements IConnectionEvents {
             waitForList.clear();
             int i = 0;
             for (String toWait1 : cmd.tokens) {
-
+                
                 WaitForStringInfo waInfo1 = new WaitForStringInfo();
-                waInfo1.waitForString = toWait1.getBytes();
+                waInfo1.waitForString = convertToBytes(toWait1);
                 waInfo1.recvdBytes.setSize(waInfo1.waitForString.length);
                 waInfo1.index = i;
                 waitForList.add(waInfo1);
