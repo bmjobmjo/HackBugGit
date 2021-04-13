@@ -295,7 +295,7 @@ public class CommandInterpretor implements IConnectionEvents {
                     cmd = commandList.get(instructionPtr);
                     switch (cmd.commandPart) {
                         case CMD_WAIT_SEC:
-                            sendStatus(CMD_WAIT_SEC, "Executing");
+                            sendStatus("Line Num "+ instructionPtr+":"+CMD_WAIT_SEC, "Executing");
                             if (cmd.tokens.size() > 1) {
                                 break;
                             }
@@ -305,7 +305,7 @@ public class CommandInterpretor implements IConnectionEvents {
                             sendStatus(CMD_WAIT_SEC, "Execution completed");
                             break;
                         case CMD_WAIT_MILLIS:
-                            sendStatus(CMD_WAIT_MILLIS, "Executing");
+                            sendStatus("Line Num "+ CMD_WAIT_MILLIS, "Executing");
                             if (cmd.tokens.size() > 1) {
                                 break;
                             }
@@ -315,7 +315,7 @@ public class CommandInterpretor implements IConnectionEvents {
                             sendStatus(CMD_WAIT_MILLIS, "Execution completed");
                             break;
                         case CMD_SEND:
-                            sendStatus(CMD_SEND, "Executing");
+                            sendStatus("Line Num "+ instructionPtr+":"+CMD_SEND, "Executing");
                             if (cmd.tokens.size() > 1) {
                                 sendStatus(CMD_SEND, "paramter count not match");
                                 break;
@@ -330,10 +330,11 @@ public class CommandInterpretor implements IConnectionEvents {
                             sendStatus(CMD_SEND, "Execution completed");
                             break;
                         case CMD_GOTO:
-                            sendStatus(CMD_WAIT_MILLIS, "Executing");
+                            sendStatus("Line Num "+ instructionPtr+":"+CMD_GOTO, "Executing");
                             if (cmd.tokens.size() > 1) {
                                 break;
                             }
+                            boolean labelFound= false;
                             String label = cmd.tokens.get(0);
                             int step = 0;
                             for (CommandStepInfo info : commandList) {
@@ -341,14 +342,18 @@ public class CommandInterpretor implements IConnectionEvents {
                                     if (info.tokens.size() == 1) {
                                         if (info.tokens.get(0).contains(cmd.tokens.get(0))) {
                                             instructionPtr = (step - 1);
+                                            sendStatus(CMD_GOTO, "Found Label at -"+instructionPtr);
+                                            labelFound=true;
                                             break;
                                         }
                                     }
                                 }
                                 ++step;
                             }
+                            if(!labelFound) sendStatus(CMD_GOTO, "Label not fpound -> "+label);
                             break;
                         case CMD_WAITFOR:
+                            sendStatus("Line Num "+ instructionPtr+":"+CMD_WAITFOR, "Executing");
                             if (cmd.tokens.size() > 1) {
                                 sendStatus(CMD_SEND, "paramter count not match");
                                 break;
@@ -356,6 +361,7 @@ public class CommandInterpretor implements IConnectionEvents {
                             if (CommonDataArea.connection == null) {
                                 sendStatus(CMD_SEND, "no valid connection exist");
                             }
+                            
                             String toWait = cmd.tokens.get(0);
                             WaitForStringInfo waInfo = new WaitForStringInfo();
                             waInfo.waitForString = toWait.getBytes();
@@ -382,17 +388,20 @@ public class CommandInterpretor implements IConnectionEvents {
 
                             }
                             waitFlag = false;
+                            sendStatus(CMD_WAITFOR, "Execution completed");
                             break;
                         case CMD_WAITMANY:
-
+                            sendStatus("Line Num "+ instructionPtr+":"+CMD_WAITMANY, "Executing");
                             int nextInstr = ProcessForManyReturn(cmd, instructionPtr);
                             if (nextInstr == -1) {
                                 sendStatus(CMD_SEND, "Case not found");
                                 break;
                             }
                             instructionPtr = nextInstr;
+                            sendStatus(CMD_WAITMANY, "Execution completed");
                             break;
                         case CMD_BUFFER:
+                            sendStatus("Line Num "+ instructionPtr+":"+CMD_BUFFER, "Executing");
                             if (cmd.tokens.size() > 1) {
                                 sendStatus(CMD_SEND, "paramter count not match");
                                 break;
@@ -405,6 +414,7 @@ public class CommandInterpretor implements IConnectionEvents {
                             } else {
                                 bufferDataFlg = false;
                             }
+                            sendStatus(CMD_BUFFER, "Execution completed");
                             break;
 
                     }

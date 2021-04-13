@@ -174,6 +174,7 @@ public class CommandProgExecPanel extends javax.swing.JPanel implements CommandE
         interpretor.Execute(script);
         }else {
             interpretor.Stop();
+            txtCommandExecStatus.setText("Stopping previous instance..\r\n");
              interpretor = new CommandInterpretor();
             String script = textCommandProg.getText();
             interpretor.addStatusListner(this);
