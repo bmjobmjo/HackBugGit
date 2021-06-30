@@ -61,14 +61,14 @@ public class ConnectionModeView extends javax.swing.JPanel {
         jComboBox1 = new javax.swing.JComboBox<>();
 
         setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
-        setLayout(new java.awt.GridLayout());
+        setLayout(new java.awt.GridLayout(1, 0));
 
         jLabel1.setText("Connection Mode");
         jPanel1.add(jLabel1);
 
         add(jPanel1);
 
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Serial Port", "TCP Server", "TCP Client", " " }));
+        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Serial Port", "TCP Server", "TCP Client", "USB" }));
         jComboBox1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jComboBox1ActionPerformed(evt);
@@ -105,6 +105,8 @@ public class ConnectionModeView extends javax.swing.JPanel {
             CommonDataArea.connectionMode = ConnectionMode.TCPServer;
         }else if(selMode.contains(MainControler.CONMODE_TCPCLIENT)){
             CommonDataArea.connectionMode = ConnectionMode.TCPClient;
+        }else if(selMode.contains(MainControler.CONMODE_USB)){
+            CommonDataArea.connectionMode = ConnectionMode.USB;
         }
         MainControler.fireConModeEvent(CommonDataArea.connectionMode);
 

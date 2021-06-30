@@ -35,10 +35,12 @@ public class MainControler {
     public static String CONMODE_SERIAL = "Serial";
     public static String CONMODE_TCPSERVER = "TCP Server";
     public static String CONMODE_TCPCLIENT = "TCP Client";
+    public static String CONMODE_USB = "USB";
     public static enum ConnectionMode {
         Serial,
         TCPClient,
-        TCPServer
+        TCPServer,
+        USB
       }
     static  ArrayList<IConnectionEvents> eventHandlers = new ArrayList<IConnectionEvents>();
     public static void Init(){

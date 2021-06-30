@@ -48,7 +48,7 @@
                 <StringItem index="0" value="Serial Port"/>
                 <StringItem index="1" value="TCP Server"/>
                 <StringItem index="2" value="TCP Client"/>
-                <StringItem index="3" value=" "/>
+                <StringItem index="3" value="USB"/>
               </StringArray>
             </Property>
           </Properties>

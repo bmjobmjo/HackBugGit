@@ -70,6 +70,7 @@ public class TCPServerConPropView extends javax.swing.JPanel {
         jList1 = new javax.swing.JList<>();
         jLabel3 = new javax.swing.JLabel();
 
+        setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
         setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jLabel2.setText("Port");

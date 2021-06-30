@@ -68,6 +68,8 @@ public class SerialPortConPropView extends javax.swing.JPanel {
         jButton1 = new javax.swing.JButton();
         buttonRefresh = new javax.swing.JButton();
 
+        setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+
         jLabel1.setText("Port");
 
         jComboPort.setName("portList"); // NOI18N

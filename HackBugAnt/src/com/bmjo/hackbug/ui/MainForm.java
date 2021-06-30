@@ -10,10 +10,12 @@ import com.bmjo.hackbug.core.IConnection;
 import com.bmjo.hackbug.core.IConnectionEvents;
 import com.bmjo.hackbug.core.MainControler;
 import com.bmjo.hackbug.core.MainControler.ConEvents;
+import com.bmjo.hackbug.utils.LogWriter;
 import java.awt.CardLayout;
 import java.awt.Component;
 import java.awt.Image;
 import java.awt.List;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -87,6 +89,7 @@ public class MainForm extends javax.swing.JFrame {
                    savePersistValues();
                 }
          });
+         HackBugIcon();
          try{
           BufferedImage img = null;
           String fileName = ClassLoader.getSystemResource("res/HackBug.png").getFile();
@@ -100,7 +103,14 @@ public class MainForm extends javax.swing.JFrame {
          }
     }
 
+ void  HackBugIcon(){     
+ 
+String fileName =System.getProperty("user.dir")+"/res/bug.png";// ClassLoader.getSystemResource("res/bug.png").getFile();
+LogWriter.WriteLog("File Name", fileName);
+Image icon = Toolkit.getDefaultToolkit().getImage(fileName);    
+setIconImage(icon);    
    
+}     
      
    public void loadPerstValues() {
         ObjectInputStream objectinputstream = null;
@@ -231,6 +241,7 @@ public void savePersistValues() {
         serialPortConPropSel1 = new com.bmjo.hackbug.ui.SerialPortConPropView();
         tCPClientConPropView1 = new com.bmjo.hackbug.ui.TCPClientConPropView();
         tCPServerConPropView1 = new com.bmjo.hackbug.ui.TCPServerConPropView();
+        usbPropView1 = new com.bmjo.hackbug.ui.UsbPropView();
         LogoPanel = new javax.swing.JPanel();
         logoLabel = new javax.swing.JLabel();
         WorkAreaPanel = new javax.swing.JPanel();
@@ -308,6 +319,7 @@ public void savePersistValues() {
 
         tCPServerConPropView1.setAlignmentY(1.0F);
         ConnectionParamPanel.add(tCPServerConPropView1, "card4");
+        ConnectionParamPanel.add(usbPropView1, "card5");
 
         ConnectionParamsPanel.add(ConnectionParamPanel);
 
@@ -1090,6 +1102,10 @@ public void savePersistValues() {
               CardLayout cardLayout =(CardLayout) ConnectionParamPanel.getLayout();
               cardLayout.show(ConnectionParamPanel, "card4");
           }
+           else if(mode== MainControler.ConnectionMode.USB){
+              CardLayout cardLayout =(CardLayout) ConnectionParamPanel.getLayout();
+              cardLayout.show(ConnectionParamPanel, "card5");
+          }
         }
 
         @Override
@@ -1164,5 +1180,6 @@ public void savePersistValues() {
     private java.awt.TextArea textAreaInputText;
     private javax.swing.JTextField textSelectedFileForSend;
     private javax.swing.JTextField textSelectedFolder;
+    private com.bmjo.hackbug.ui.UsbPropView usbPropView1;
     // End of variables declaration//GEN-END:variables
 }
