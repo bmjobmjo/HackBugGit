@@ -68,7 +68,7 @@ public class USBHelper {
 
    public static DefaultMutableTreeNode getDeviceTree(int vid, int pid, DefaultMutableTreeNode devRoot)
    {
-         String deviceInfo="<HTML>";
+        
         try {
             Context context = new Context();
            
@@ -91,20 +91,13 @@ public class USBHelper {
                     throw new LibUsbException("Unable to read device descriptor", result);
                 }
                 if(descriptor.idVendor()!=vid) continue;
-                
-                System.out.println("vendorID ->" + descriptor.idVendor() + " Product Id ->" + descriptor.idProduct() + " Class->" + descriptor.bDeviceClass());
-                String desc1 = descriptor.dump();
-                System.out.println(desc1);
-                deviceInfo = desc1;
+              
                 //devRoot = new DefaultMutableTreeNode(descriptor.idVendor()+":"+descriptor.idProduct());
                 devRoot.removeAllChildren();
                 ConfigDescriptor cd = new ConfigDescriptor();
                 result = LibUsb.getConfigDescriptor(device, (byte) 0, cd);
                 if (result == LibUsb.SUCCESS) {
                     
-                    System.out.println("CONFIG DESC");
-                    desc1 =cd.dump();
-                    System.out.println(desc1);
                    // deviceInfo+=desc1;
                     
                     for(int m=0;m<cd.bNumInterfaces();++m)
@@ -114,7 +107,7 @@ public class USBHelper {
                         final InterfaceDescriptor ifaceDescriptor = iface
                                 .altsetting()[0];
                       
-                       deviceInfo+= ifaceDescriptor.dump();
+                     
                        String interfaceName = "Interface:"+ifaceDescriptor.bInterfaceNumber();
                        DefaultMutableTreeNode interfaceNode = new DefaultMutableTreeNode(interfaceName);//
                        DefaultMutableTreeNode alterSet = new DefaultMutableTreeNode("Alternate Setting:"+ifaceDescriptor.bAlternateSetting());
@@ -130,8 +123,6 @@ public class USBHelper {
                                 
                                  System.out.println("---------INTERFACE------------");
                              
-                               desc1=ifaceDescriptor.endpoint()[l].dump();
-                                System.out.println(desc1);
                                 EndpointDescriptor ep = ifaceDescriptor.endpoint()[l];
                                String epType = "OUT";
                                if((ep.bEndpointAddress()&0x80)==0x80) epType="IN";
@@ -159,12 +150,6 @@ public class USBHelper {
                              
                            for(int l =0;l<ifaceDescriptor.bNumEndpoints();++l)
                             {
-                                System.out.println("End Point ->"+ ifaceDescriptor.endpoint()[0]
-                                    .bEndpointAddress());
-                                
-                                 System.out.println("---------INTERFACE------------");
-                             
-                               desc1=ifaceDescriptor.endpoint()[l].dump();
                               
                                EndpointDescriptor ep = ifaceDescriptor.endpoint()[l];
                                String epType = "OUT";
