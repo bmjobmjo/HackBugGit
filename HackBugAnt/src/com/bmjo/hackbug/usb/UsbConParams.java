@@ -10,8 +10,8 @@ package com.bmjo.hackbug.usb;
  * @author bijum
  */
 public class UsbConParams {
-    int vid;
-    int pid;
+    short vid;
+    short pid;
     int interfaceNumber;
     int altSetting;
     short epIn;

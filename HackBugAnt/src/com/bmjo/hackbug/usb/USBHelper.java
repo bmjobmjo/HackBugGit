@@ -78,7 +78,9 @@ public class USBHelper {
             }
 
             String devDesc = new String();// = descriptor.idVendor()+":"+ descriptor.idProduct()+":"+ descriptor.bDeviceClass();
-            devDesc = devDesc.format("%x:%x:", descriptor.idVendor(), descriptor.idProduct());
+            short pid=descriptor.idProduct();
+            short vid =descriptor.idVendor();
+            devDesc = devDesc.format("%x:%x:", vid, pid);
             int devClassIdnum = descriptor.bDeviceClass();
             String className = getClassName(devClassIdnum);
             if (className != null) {
@@ -93,7 +95,7 @@ public class USBHelper {
         return devList;
     }
 
-    public static DefaultMutableTreeNode getDeviceTree(int vid, int pid, DefaultMutableTreeNode devRoot) {
+    public static DefaultMutableTreeNode getDeviceTree(String devName ,String vid, String pid, DefaultMutableTreeNode devRoot) {
 
         try {
             Context context = new Context();
@@ -116,11 +118,20 @@ public class USBHelper {
                 if (result != LibUsb.SUCCESS) {
                     throw new LibUsbException("Unable to read device descriptor", result);
                 }
-                if (descriptor.idVendor() != vid) {
+                short viddev = descriptor.idVendor() ;
+                short piddev = descriptor.idProduct();
+                String vidS = String.format("%x", viddev);
+                String pidS = String.format("%x", piddev);
+                if (!vidS.equals(vid)) {
+                    continue;
+                }
+                if(!pidS.equals(pid)) {
                     continue;
                 }
 
                 //devRoot = new DefaultMutableTreeNode(descriptor.idVendor()+":"+descriptor.idProduct());
+                
+                devRoot.setUserObject(devName);
                 devRoot.removeAllChildren();
                 interfaces = new HashMap<String, UsbConParams>();
                 ConfigDescriptor cd = new ConfigDescriptor();
@@ -134,8 +145,8 @@ public class USBHelper {
                             final InterfaceDescriptor ifaceDescriptor = iface
                                     .altsetting()[0];
                             UsbConParams conp = new UsbConParams();
-                            conp.pid = pid;
-                            conp.vid = vid;
+                            conp.pid = descriptor.idProduct();
+                            conp.vid = descriptor.idVendor();
                             conp.interfaceNumber = ifaceDescriptor.bInterfaceNumber();
                             conp.altSetting =ifaceDescriptor.bAlternateSetting();
                             
@@ -183,8 +194,8 @@ public class USBHelper {
                                 String parceableInfo = ifaceDescriptor.bInterfaceNumber() + ":";
                                 
                                 UsbConParams conp = new UsbConParams();
-                                conp.pid = pid;
-                                conp.vid = vid;
+                                conp.pid = descriptor.idProduct();
+                                conp.vid = descriptor.idVendor();
                                 conp.interfaceNumber = ifaceDescriptor.bInterfaceNumber();
                                 conp.altSetting =ifaceDescriptor.bAlternateSetting();
                                 

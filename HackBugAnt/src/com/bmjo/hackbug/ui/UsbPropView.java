@@ -57,10 +57,10 @@ public class UsbPropView extends javax.swing.JPanel {
         if(selectedItem==null) return;
         String [] parts = selectedItem.split(":");
         if(parts.length>=2){
-        int vid = Integer.parseInt(parts[0],16);
-        int pid = Integer.parseInt(parts[1],16);
+       // short vid = Short.parseShort(parts[0],16);
+        //short pid = Short.parseShort(parts[1],16);
  
-        USBHelper.getDeviceTree(vid, pid, root);
+        USBHelper.getDeviceTree(selectedItem,parts[0],parts[1], root);
         model.reload(root);
         }
         //new DefaultMutableTreeNode("another_child").
@@ -174,8 +174,8 @@ public class UsbPropView extends javax.swing.JPanel {
         if(selectedItem==null) return;
         String [] parts = selectedItem.split(":");
         if(parts.length>=2){
-        int vid = Integer.parseInt(parts[0],16);
-        int pid = Integer.parseInt(parts[1],16);
+        short vid = Short.parseShort(parts[0],16);
+        short pid = Short.parseShort(parts[1],16);
         }
       
        DefaultMutableTreeNode selectedNode =  (DefaultMutableTreeNode)jTreeUsbDev.getLastSelectedPathComponent();
