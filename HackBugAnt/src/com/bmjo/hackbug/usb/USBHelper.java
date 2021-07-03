@@ -249,7 +249,7 @@ public class USBHelper {
         return null;
     }
 
-    public static String getDeiceInfo(int vid, int pid) {
+    public static String getDeiceInfo(String vid, String pid) {
         String deviceInfo = "<HTML>";
         try {
             Context context = new Context();
@@ -272,7 +272,14 @@ public class USBHelper {
                 if (result != LibUsb.SUCCESS) {
                     throw new LibUsbException("Unable to read device descriptor", result);
                 }
-                if (descriptor.idVendor() != vid) {
+                short viddev = descriptor.idVendor() ;
+                short piddev = descriptor.idProduct();
+                String vidS = String.format("%x", viddev);
+                String pidS = String.format("%x", piddev);
+                if (!vidS.equals(vid)) {
+                    continue;
+                }
+                if(!pidS.equals(pid)) {
                     continue;
                 }
                 System.out.println("vendorID ->" + descriptor.idVendor() + " Product Id ->" + descriptor.idProduct() + " Class->" + descriptor.bDeviceClass());

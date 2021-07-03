@@ -152,9 +152,9 @@ public class UsbPropView extends javax.swing.JPanel {
         if(selectedItem==null) return;
         String [] parts = selectedItem.split(":");
         if(parts.length>=2){
-        int vid = Integer.parseInt(parts[0],16);
-        int pid = Integer.parseInt(parts[1],16);
-        String devInfo =USBHelper.getDeiceInfo(vid,pid);
+      //  int vid = Integer.parseInt(parts[0],16);
+     //   int pid = Integer.parseInt(parts[1],16);
+        String devInfo =USBHelper.getDeiceInfo(parts[0],parts[1]);
         
         UsbDetailsDlg usbDet = new UsbDetailsDlg(null,true);
         usbDet.setUsbDetails(devInfo);
