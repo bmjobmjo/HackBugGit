@@ -45,10 +45,8 @@ public class TcpConnection implements IConnection {
     }
 
     public static class ConParams {
-
         public String serverIP;
         public int port;
-
     }
 
     public TcpConnection() {

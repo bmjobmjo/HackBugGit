@@ -5,22 +5,44 @@
  */
 package com.bmjo.hackbug.usb;
 
+import com.bmjo.hackbug.core.CommonDataArea;
 import com.bmjo.hackbug.core.IConnection;
+import com.bmjo.hackbug.core.MainControler;
+import com.bmjo.hackbug.serial.SerialPortConection;
+import com.bmjo.hackbug.utils.LogWriter;
 
 /**
  *
  * @author bijum
  */
 public class UsbControler implements IConnection{
-    
+    USBHelper usbHelper ;
+    boolean running;
+    Thread threadReader;
+    String conName;
     @Override
     public boolean connect(Object conInfo) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        usbHelper = new USBHelper();
+        if(usbHelper.Open((UsbConParams)conInfo)) {
+               ++CommonDataArea.conCount;
+                conName = ((UsbConParams)conInfo).vid+":"+ ((UsbConParams)conInfo).pid+":"+CommonDataArea.conCount;
+                MainControler.fireConEvent(MainControler.ConEvents.Connected, "USB Device "+conName+ " Opened\r\n",this);
+
+        }else{
+              MainControler.fireConEvent(MainControler.ConEvents.ConFailed,"Failed to Open usb device ",this);
+                return false;
+
+        }
+        running = true;
+        threadReader = new Thread(new ReadUsbData());
+        threadReader.start();
+        return true;
     }
 
     @Override
     public boolean send(byte[] data) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        usbHelper.writeUsb(data);
+        return true;
     }
 
     @Override
@@ -35,7 +57,7 @@ public class UsbControler implements IConnection{
 
     @Override
     public String getErrorString() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return usbHelper.getError();
     }
 
     @Override
@@ -45,7 +67,17 @@ public class UsbControler implements IConnection{
 
     @Override
     public boolean close() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        try {
+            usbHelper.close();
+            running = false;
+            
+            threadReader.join(1000);
+            MainControler.fireConEvent(MainControler.ConEvents.ConClosed, "USB device closed", this);
+
+            return true;
+        } catch (Exception exp) {
+            return false;
+        }
     }
 
     @Override
@@ -53,6 +85,29 @@ public class UsbControler implements IConnection{
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
+       void fireReadComplete(byte[] data, int numBytes){
+       MainControler.onReceive(data, numBytes,this,null);
+    }
+    
+    class ReadUsbData implements Runnable{
+        @Override
+        public void run() {
+          
+           while(running){
+              try{
+              byte [] block = usbHelper.readUsb();
+               
+               if((block!=null)&&(block.length>0)){
+               int len =block.length;
+               fireReadComplete(block, len);
+               }
+              }catch(Exception exp){
+                  LogWriter.WriteLog("USB READ", exp.getMessage());
+              }
+           }
+        }
+        
+    }
       
    
 }

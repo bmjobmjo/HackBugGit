@@ -4,7 +4,15 @@
  * and open the template in the editor.
  */
 package com.bmjo.hackbug.ui;
+import com.bmjo.hackbug.core.CommonDataArea;
+import com.bmjo.hackbug.core.IConnection;
+import com.bmjo.hackbug.core.IConnectionEvents;
+import com.bmjo.hackbug.core.MainControler;
+import com.bmjo.hackbug.serial.SerialPortConection;
 import com.bmjo.hackbug.usb.USBHelper;
+import com.bmjo.hackbug.usb.UsbConParams;
+import com.bmjo.hackbug.usb.UsbControler;
+import com.bmjo.hackbug.utils.AlertBox;
 import com.bmjo.hackbug.utils.LogWriter;
 import java.awt.event.ItemEvent;
 /**
@@ -12,9 +20,12 @@ import java.awt.event.ItemEvent;
  * @author bijum
  */
 import java.util.ArrayList;
+import javax.swing.JDialog;
+import static javax.swing.JOptionPane.showMessageDialog;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeModel;
+import javax.swing.tree.TreePath;
 public class UsbPropView extends javax.swing.JPanel {
 
     /**
@@ -31,6 +42,7 @@ public class UsbPropView extends javax.swing.JPanel {
         }
         jTreeUsbDev.removeAll();
        
+         MainControler.AddConEventListner(new UsbPropView.ConnectionEventss());
         }catch(Exception exp){
             LogWriter.WriteLog("USB", exp.getMessage());
         }
@@ -154,10 +166,43 @@ public class UsbPropView extends javax.swing.JPanel {
 
     private void jButtonOpenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonOpenActionPerformed
         // TODO add your handling code here:
-        UsbOpenDialog usbDet = new UsbOpenDialog(null,true);
-        
-        usbDet.pack();
-        usbDet.setVisible(true);
+      
+        if(jTreeUsbDev.getSelectionPath().getPathCount()!=2){
+         AlertBox.Alert("Select an Interface to open");
+        }
+       String selectedItem = (String)  jComboBox1.getSelectedItem();
+        if(selectedItem==null) return;
+        String [] parts = selectedItem.split(":");
+        if(parts.length>=2){
+        int vid = Integer.parseInt(parts[0],16);
+        int pid = Integer.parseInt(parts[1],16);
+        }
+      
+       DefaultMutableTreeNode selectedNode =  (DefaultMutableTreeNode)jTreeUsbDev.getLastSelectedPathComponent();
+       String nodeName = (String)selectedNode.getUserObject();
+        UsbConParams params = USBHelper.interfaces.get(nodeName);
+       //AlertBox.Alert(nodeName);
+       
+         if(jButtonOpen.getText()=="Open"){
+           
+            if(CommonDataArea.connection==null) 
+            {
+                CommonDataArea.connection =  new UsbControler() ;
+            }else {
+                 CommonDataArea.connection.close();
+                 CommonDataArea.connection = new UsbControler();
+            }
+           
+            if(!CommonDataArea.connection.connect(params)) {
+                String error = CommonDataArea.connection.getErrorString();
+                 showMessageDialog(this, "Connection Failed");
+            }
+        }else if(jButtonOpen.getText()=="Close"){
+            if(CommonDataArea.connection!=null){
+                CommonDataArea.connection.close();
+            }
+        }
+       
     }//GEN-LAST:event_jButtonOpenActionPerformed
 
     private void jComboBox1ItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jComboBox1ItemStateChanged
@@ -167,6 +212,41 @@ public class UsbPropView extends javax.swing.JPanel {
             FillUsbTree();
         }
     }//GEN-LAST:event_jComboBox1ItemStateChanged
+
+     class ConnectionEventss implements IConnectionEvents{
+
+
+        @Override
+        public void onConnectionModeChange(MainControler.ConnectionMode mode) {
+            }
+
+        @Override
+        public void onEvent(MainControler.ConEvents event, Object param, Object source) {
+           if(source instanceof UsbControler){
+           if(event == MainControler.ConEvents.Connected){
+               jButtonOpen.setText("Close");
+            }else if(event == MainControler.ConEvents.ConClosed){
+                 jButtonOpen.setText("Open");
+            }     
+           }
+        }
+
+        @Override
+        public void onError(MainControler.Error error, Object details) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+
+        @Override
+        public void onReceive(byte[] data, int numBytes, IConnection eventSource, Object eventInfo) {
+             return; 
+        }
+
+        @Override
+        public void onSelectedConChange(IConnection connection) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+        
+    }
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
