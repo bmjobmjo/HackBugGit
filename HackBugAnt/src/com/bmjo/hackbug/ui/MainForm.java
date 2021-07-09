@@ -250,6 +250,7 @@ public void savePersistValues() {
         textAreaInputText = new java.awt.TextArea();
         hexView1 = new com.bmjo.hackbug.ui.HexView();
         commandProgExecPanel2 = new com.bmjo.hackbug.ui.CommandProgExecPanel();
+        about1 = new com.bmjo.hackbug.ui.About();
         SaveNDisplayOptionPanel = new javax.swing.JPanel();
         SaveToFilePanel = new javax.swing.JPanel();
         textSelectedFolder = new javax.swing.JTextField();
@@ -340,6 +341,7 @@ public void savePersistValues() {
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         getContentPane().add(ConnectionManagerPanel, gridBagConstraints);
 
         WorkAreaPanel.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
@@ -353,6 +355,19 @@ public void savePersistValues() {
         HexNormalViewHolder.addTab("Ascii", textAreaInputText);
         HexNormalViewHolder.addTab("Hex", hexView1);
         HexNormalViewHolder.addTab("CommandExec", commandProgExecPanel2);
+
+        javax.swing.GroupLayout about1Layout = new javax.swing.GroupLayout(about1);
+        about1.setLayout(about1Layout);
+        about1Layout.setHorizontalGroup(
+            about1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 1139, Short.MAX_VALUE)
+        );
+        about1Layout.setVerticalGroup(
+            about1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 414, Short.MAX_VALUE)
+        );
+
+        HexNormalViewHolder.addTab("About", about1);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
@@ -632,7 +647,7 @@ public void savePersistValues() {
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
         getContentPane().add(WorkAreaPanel, gridBagConstraints);
 
         pack();
@@ -1154,6 +1169,7 @@ public void savePersistValues() {
     private javax.swing.JTextField SendText5;
     private javax.swing.JTextField SendText6;
     private javax.swing.JPanel WorkAreaPanel;
+    private com.bmjo.hackbug.ui.About about1;
     private javax.swing.JButton btnChooseFileToSend;
     private javax.swing.JButton btnSendFile;
     private javax.swing.JButton buttonClearText;
