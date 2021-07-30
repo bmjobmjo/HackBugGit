@@ -24,11 +24,13 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -64,7 +66,10 @@ public class MainForm extends javax.swing.JFrame {
     FileOutputStream saveLogFile;
     boolean saveEnabled = false;
     boolean timeStampEnabled = false;
+    ArrayList<String> recentCommands ;
 
+    public static int UP_ARROW = 38;
+    public static int DOWN_ARROW = 40;
     /**
      * Creates new form MainForm
      */
@@ -76,11 +81,12 @@ public class MainForm extends javax.swing.JFrame {
         initComponents();
         MainControler.AddConEventListner(new ConEventsHandler());
         loadPerstValues();
-        
+        loadRecentValues();
 
         addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
                 savePersistValues();
+                saveRecentValues();
             }
         });
         HackBugIcon();
@@ -105,6 +111,88 @@ public class MainForm extends javax.swing.JFrame {
         setIconImage(icon);
 
     }
+    
+    void addToRecentCommands(String command)
+    {
+        int index=0;
+        boolean found=false;
+        for(String cmd : recentCommands){
+        if(cmd.equals(command)){found = true; break;}
+        ++index;
+        }
+        if(found)
+        recentCommands.remove(index);
+        recentCommands.add(command);
+    }
+    int commandIndex=0;
+    String getNextCommand(){
+        try{
+        String cmd = recentCommands.get(commandIndex);
+        if(commandIndex<(recentCommands.size()-1)){
+            ++commandIndex;
+        }
+        return cmd;
+        }catch(Exception exp){
+            return null;
+        }
+    }
+    
+     String getPrevCommand(){
+        try{
+        String cmd = recentCommands.get(commandIndex);
+        if(commandIndex>0){
+            --commandIndex;
+        }
+        return cmd;
+        }catch(Exception exp){
+            return null;
+        }
+    }
+     
+      public void saveRecentValues() {
+       
+        try {
+            String filePath = System.getProperty("user.home")+"//hackbug//recent.ser";
+            FileWriter fileOut = new FileWriter(filePath,false);
+            for(String cmd : recentCommands){
+                if(!cmd.contains("\r")) cmd+="\r\n";
+                 fileOut.write(cmd);
+            }
+            fileOut.flush();
+            fileOut.close();
+             
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
+             LogWriter.WriteLog("Exception", ex.getMessage());
+            //JOptionPane.showMessageDialog(this, "Error Saving Persist Values.", ex.getMessage(), JOptionPane.WARNING_MESSAGE);
+        } catch (IOException ex) {
+            Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
+             LogWriter.WriteLog("Exception", ex.getMessage());
+           // JOptionPane.showMessageDialog(this, "Error Loading Saving Values.", ex.getMessage(), JOptionPane.WARNING_MESSAGE);
+        } 
+    }
+     
+   public void loadRecentValues(){
+        recentCommands = new ArrayList<String>();
+        try {
+             String filePath = System.getProperty("user.home")+"//hackbug//recent.ser";
+             File f = new File(filePath);
+            
+            try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+             String line;
+             while ((line = br.readLine()) != null) {
+                recentCommands.add(line);
+             }
+
+            }
+        } catch (Exception e) {
+            Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, e);
+            JOptionPane.showMessageDialog(this, "Error Loading Persist Values.", e.getMessage(), JOptionPane.WARNING_MESSAGE);
+        } finally {
+
+        }
+    
+   }
 
     public void loadPerstValues() {
         ObjectInputStream objectinputstream = null;
@@ -460,6 +548,11 @@ public class MainForm extends javax.swing.JFrame {
                 SendText1ActionPerformed(evt);
             }
         });
+        SendText1.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                SendText1KeyPressed(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -743,6 +836,7 @@ public class MainForm extends javax.swing.JFrame {
 
     private void SendText1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SendText1ActionPerformed
         // TODO add your handling code here:
+       String cmd = evt.getActionCommand();
     }//GEN-LAST:event_SendText1ActionPerformed
 
     private void textSelectedFolderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_textSelectedFolderActionPerformed
@@ -784,6 +878,18 @@ public class MainForm extends javax.swing.JFrame {
         });
         thread.start();
     }//GEN-LAST:event_btnSendFileActionPerformed
+
+    private void SendText1KeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_SendText1KeyPressed
+        // TODO add your handling code here:
+       int code = evt.getExtendedKeyCode();
+       if(code == UP_ARROW ){
+           String cmd = getNextCommand();
+           SendText1.setText(cmd);
+       }else if(code == DOWN_ARROW ){
+           String cmd = getPrevCommand();
+           SendText1.setText(cmd);
+       }
+    }//GEN-LAST:event_SendText1KeyPressed
     enum SendMode {
         Ascii,
         Hex,
@@ -835,6 +941,7 @@ public class MainForm extends javax.swing.JFrame {
             byte[] toSend = convertToAscii(text);
             MainControler.send(toSend);
             logToFile(toSend, false, timeStampEnabled);
+            addToRecentCommands(text);
             if (checkboxEcho.isSelected()) {
                 textAreaInputText.append(text);
             }
