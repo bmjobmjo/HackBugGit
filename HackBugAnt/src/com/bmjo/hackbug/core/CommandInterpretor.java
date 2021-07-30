@@ -51,6 +51,10 @@ public class CommandInterpretor implements IConnectionEvents {
     String script;
     ArrayList<WaitForStringInfo> waitForList = new ArrayList<WaitForStringInfo>();
 
+    String commndJsonStr ="[{ \"cmd\": \"waitsec\", \"params\":1},{ \"cmd\": \"waitmilli\", \"params\":1},{ \"cmd\": \"send\", \"params\":1},{ \"cmd\": \"goto\", \"params\":1},{ \"cmd\": \":label\", \"params\":1},"+
+    "{ \"cmd\": \"waitfor\", \"params\":1},{ \"cmd\": \"waitmany\", \"params\":100},{ \"cmd\": \"case\", \"params\":1},{ \"cmd\": \"end\", \"params\":0},{ \"cmd\": \"default\", \"params\":0}"+
+    ",{ \"cmd\": \"recvbuffer\", \"params\":1}]";
+
     boolean waitFlag = false;
     boolean bufferDataFlg;
     ArrayList<byte[]> recvdBytesBuff = new ArrayList<byte[]>();
@@ -493,7 +497,15 @@ public class CommandInterpretor implements IConnectionEvents {
         }
 
         void CommandListReader() {
+            try{
             JSONParser jsonParser = new JSONParser();
+            Object obj = jsonParser.parse(commndJsonStr);
+            commandsJson = (JSONArray) obj;
+            }catch (org.json.simple.parser.ParseException ex) {
+                Logger.getLogger(CommandInterpretor.class.getName()).log(Level.SEVERE, null, ex);
+                LogWriter.WriteLog("Exception", ex.getMessage());
+            }
+           /* JSONParser jsonParser = new JSONParser();
             String fileName = ClassLoader.getSystemResource("scriptcommands.json").getFile();
             try (FileReader reader = new FileReader(fileName)) {
                 //Read JSON file
@@ -511,7 +523,7 @@ public class CommandInterpretor implements IConnectionEvents {
             } catch (org.json.simple.parser.ParseException ex) {
                 Logger.getLogger(CommandInterpretor.class.getName()).log(Level.SEVERE, null, ex);
                 LogWriter.WriteLog("Exception", ex.getMessage());
-            }
+            }*/
         }
 
         int checkValidCommand(String command) {
