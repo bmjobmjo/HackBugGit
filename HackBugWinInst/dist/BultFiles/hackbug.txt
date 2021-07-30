@@ -1,0 +1,16 @@
+Startup:Starting..
+File Name:D:\Works\Scratch\dist/res/bug.png
+Startup:Starting..
+File Name:D:\Works\Scratch\dist/res/bug.png
+Startup:Starting..
+File Name:D:\Works\Scratch\dist/res/bug.png
+Startup:Starting..
+File Name:D:\Works\Scratch\dist/res/bug.png
+null:Cannot invoke "com.fazecast.jSerialComm.SerialPort.isOpen()" because "this.port" is null
+null:Cannot invoke "com.fazecast.jSerialComm.SerialPort.isOpen()" because "this.port" is null
+Startup:Starting..
+File Name:D:\Works\Scratch\dist/res/bug.png
+Startup:Starting..
+File Name:D:\Works\Scratch\dist/res/bug.png
+Startup:Starting..
+File Name:D:\Works\HackBug\HackBugWinInst\dist\BultFiles/res/bug.png

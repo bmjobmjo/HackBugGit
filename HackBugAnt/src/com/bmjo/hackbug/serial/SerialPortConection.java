@@ -132,7 +132,9 @@ public class SerialPortConection  implements IConnection{
             MainControler.fireConEvent(MainControler.ConEvents.ConClosed,"Closed Serial Port "+port.getSystemPortName()+"\r\n",this);
             return true;
         }catch(Exception exp){
+             LogWriter.WriteLog("Exception", exp.getMessage());
             return false;
+            
         }
     }
     

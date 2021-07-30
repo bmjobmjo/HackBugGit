@@ -9,6 +9,7 @@ import com.bmjo.hackbug.core.CommonDataArea;
 import com.bmjo.hackbug.core.IConnection;
 import com.bmjo.hackbug.core.MainControler;
 import com.bmjo.hackbug.tcp.TcpConnection;
+import com.bmjo.hackbug.utils.LogWriter;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
@@ -116,7 +117,7 @@ public class TcpServer implements IConnection{
                     conList.add(conContext);
                 }
             } catch (Exception exp) {
-
+                 LogWriter.WriteLog("Exception", exp.getMessage());
             }
         }
     }

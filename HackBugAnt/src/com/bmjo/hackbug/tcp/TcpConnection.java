@@ -7,6 +7,7 @@ package com.bmjo.hackbug.tcp;
 
 import com.bmjo.hackbug.serial.*;
 import com.bmjo.hackbug.core.*;
+import com.bmjo.hackbug.utils.LogWriter;
 import com.fazecast.jSerialComm.*;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -92,6 +93,7 @@ public class TcpConnection implements IConnection {
             return true;
         } catch (IOException ex) {
             Logger.getLogger(TcpConnection.class.getName()).log(Level.SEVERE, null, ex);
+             LogWriter.WriteLog("Exception", ex.getMessage());
             return false;
         }
     }
@@ -134,7 +136,7 @@ public class TcpConnection implements IConnection {
                 }
               //  MainControler.fireConEvent(MainControler.ConEvents.ConClosed, "Connnection Closed \r\n",this);
             } catch (Exception exp) {
-
+                 LogWriter.WriteLog("Exception", exp.getMessage());
             }
         }
     }

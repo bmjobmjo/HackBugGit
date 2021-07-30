@@ -4,12 +4,14 @@
  * and open the template in the editor.
  */
 package com.bmjo.hackbug.ui;
+
 import com.bmjo.hackbug.core.CommandInterpretor;
 import com.bmjo.hackbug.core.CommonDataArea;
 import com.bmjo.hackbug.core.IConnection;
 import com.bmjo.hackbug.core.IConnectionEvents;
 import com.bmjo.hackbug.core.MainControler;
 import com.bmjo.hackbug.core.MainControler.ConEvents;
+import com.bmjo.hackbug.utils.AlertBox;
 import com.bmjo.hackbug.utils.LogWriter;
 import java.awt.CardLayout;
 import java.awt.Component;
@@ -58,95 +60,78 @@ import javax.swing.filechooser.FileNameExtensionFilter;
  */
 public class MainForm extends javax.swing.JFrame {
 
-    boolean dispPause=false;
+    boolean dispPause = false;
     FileOutputStream saveLogFile;
     boolean saveEnabled = false;
     boolean timeStampEnabled = false;
+
     /**
      * Creates new form MainForm
      */
     public MainForm() {
+        //AlertBox.Alert(  System.getProperty("user.home"));
+        createAppDir();
+        LogWriter.WriteLog("Startup", "Starting..");
         MainControler.Init();
         initComponents();
         MainControler.AddConEventListner(new ConEventsHandler());
-         loadPerstValues();
-         
-         String script = "WaitFor \"hello world\" \r\nLabel\r\nwaitsec 100 \r\n Goto 1\r\nLabel 1\r\n ActonOn \"ATDP 123345\" \\x667766 \"ATMK\" \\x6789\r\n" +
-"Action 1\r\n" +
-"Send \"\\x6677\" \r\n" +
-"END \r\n" +
-"Action 2\r\n" +
-"Send \"\\x66887\" \r\n" +
-"Default\r\n" +
-"Send \"\\x6996887\" \r\n" +
-"END \"hello\" \"biju\" \"mon\" \\x3344a \\xA45B \"Kill\" \r\n"+
-"END 2\r\n";
-      //  CommandInterpretor cmdInter = new CommandInterpretor();
-      //   cmdInter.Execute(script);
-         
-         addWindowListener(new WindowAdapter() {
-             public void windowClosing(WindowEvent e){
-                   savePersistValues();
-                }
-         });
-         HackBugIcon();
-         try{
-          BufferedImage img = null;
-          String fileName = ClassLoader.getSystemResource("res/HackBug.png").getFile();
-          img = ImageIO.read(new File(fileName));
-          Image dimg = img.getScaledInstance(logoLabel.getWidth(), logoLabel.getHeight(),
-            Image.SCALE_SMOOTH);
-          ImageIcon imageIcon = new ImageIcon(dimg);
-          logoLabel.setIcon(imageIcon);
-         }catch(Exception exp){
-             Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, exp);
-         }
+        loadPerstValues();
+        
+
+        addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent e) {
+                savePersistValues();
+            }
+        });
+        HackBugIcon();
+        try {
+            BufferedImage img = null;
+            String fileName = ClassLoader.getSystemResource("res/HackBug.png").getFile();
+            img = ImageIO.read(new File(fileName));
+            Image dimg = img.getScaledInstance(logoLabel.getWidth(), logoLabel.getHeight(),
+                    Image.SCALE_SMOOTH);
+            ImageIcon imageIcon = new ImageIcon(dimg);
+            logoLabel.setIcon(imageIcon);
+        } catch (Exception exp) {
+            Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, exp);
+        }
     }
 
- void  HackBugIcon(){     
- 
-String fileName =System.getProperty("user.dir")+"/res/bug.png";// ClassLoader.getSystemResource("res/bug.png").getFile();
-LogWriter.WriteLog("File Name", fileName);
-Image icon = Toolkit.getDefaultToolkit().getImage(fileName);    
-setIconImage(icon);    
-   
-}     
-     
-   public void loadPerstValues() {
+    void HackBugIcon() {
+
+        String fileName = System.getProperty("user.dir") + "/res/bug.png";// ClassLoader.getSystemResource("res/bug.png").getFile();
+        LogWriter.WriteLog("File Name", fileName);
+        Image icon = Toolkit.getDefaultToolkit().getImage(fileName);
+        setIconImage(icon);
+
+    }
+
+    public void loadPerstValues() {
         ObjectInputStream objectinputstream = null;
         try {
-            String jarPath="excpetion";
-            try {
-                jarPath = MainForm.class
-                        .getProtectionDomain()
-                        .getCodeSource()
-                        .getLocation()
-                        .toURI()
-                        .getPath();
-            } catch (URISyntaxException ex) {
-                Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
+             String filePath = System.getProperty("user.home")+"//hackbug//persist.ser";
+             File f = new File(filePath);
+            if(!f.exists()){
+                filePath = System.getProperty("user.dir")+"//persist.ser";
             }
             
-            String filePath = jarPath;
-            filePath=filePath.substring(0, filePath.lastIndexOf("/"))+"/persist.ser";
             FileInputStream streamIn = new FileInputStream(filePath);
             objectinputstream = new ObjectInputStream(streamIn);
-           
 
             for (int i = 0; i < 10; ++i) {
-                String compoName = "SendText"+i;
+                String compoName = "SendText" + i;
                 JTextField sednText = new JTextField();
 
                 for (Component sendTextCom : CommandInputContralArrayPanel.getComponents()) {
                     try {
                         if (((JTextField) sendTextCom).getName().contains(compoName)) {
                             sednText = (JTextField) sendTextCom;
-                             String persVal = (String) objectinputstream.readObject();
-                             sednText.setText(persVal);
+                            String persVal = (String) objectinputstream.readObject();
+                            sednText.setText(persVal);
                             break;
                         }
                     } catch (java.lang.ClassCastException exp) {
-
+                         LogWriter.WriteLog("Exception", exp.getMessage());
                     }
                 }
             }
@@ -154,69 +139,66 @@ setIconImage(icon);
                 objectinputstream.close();
             }
         } catch (Exception e) {
-             Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, e);
-             JOptionPane.showMessageDialog(this, "Error Loading Persist Values.", e.getMessage(),JOptionPane.WARNING_MESSAGE);
+            Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, e);
+            JOptionPane.showMessageDialog(this, "Error Loading Persist Values.", e.getMessage(), JOptionPane.WARNING_MESSAGE);
         } finally {
 
         }
     }
-public void savePersistValues() {
+
+    public void createAppDir() {
+        String filePath = System.getProperty("user.home")+"//hackbug";
+        File theDir = new File(filePath);
+        if (!theDir.exists()) {
+            theDir.mkdirs();
+        }
+    }
+    public void savePersistValues() {
         FileOutputStream fout = null;
         try {
-             String jarPath="excpetion";
-            try {
-                jarPath = MainForm.class
-                        .getProtectionDomain()
-                        .getCodeSource()
-                        .getLocation()
-                        .toURI()
-                        .getPath();
-            } catch (URISyntaxException ex) {
-                Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            
-            String filePath = jarPath;
-            
-            filePath=filePath.substring(0, filePath.lastIndexOf("/"))+"/persist.ser";
-            // JOptionPane.showMessageDialog(this, filePath,"File Ptah",JOptionPane.WARNING_MESSAGE);
+            String filePath = System.getProperty("user.home")+"//hackbug//persist.ser";
+
 
             fout = new FileOutputStream(filePath);
             ObjectOutputStream oos;
 
             oos = new ObjectOutputStream(fout);
             for (int i = 0; i < 10; ++i) {
-                String compoName = "SendText"+i;
+                String compoName = "SendText" + i;
                 JTextField sednText = new JTextField();
 
                 for (Component sendTextCom : CommandInputContralArrayPanel.getComponents()) {
                     try {
                         if (((JTextField) sendTextCom).getName().contains(compoName)) {
                             sednText = (JTextField) sendTextCom;
-                             oos.writeObject(sednText.getText());
+                            oos.writeObject(sednText.getText());
                             break;
                         }
                     } catch (java.lang.ClassCastException exp) {
-
+                        LogWriter.WriteLog("Exception", exp.getMessage());
                     }
                 }
             }
-           
-           
+
         } catch (FileNotFoundException ex) {
             Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
-             JOptionPane.showMessageDialog(this, "Error Saving Persist Values.", ex.getMessage(),JOptionPane.WARNING_MESSAGE);
+             LogWriter.WriteLog("Exception", ex.getMessage());
+            //JOptionPane.showMessageDialog(this, "Error Saving Persist Values.", ex.getMessage(), JOptionPane.WARNING_MESSAGE);
         } catch (IOException ex) {
             Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
-             JOptionPane.showMessageDialog(this, "Error Loading Saving Values.", ex.getMessage(),JOptionPane.WARNING_MESSAGE);
+             LogWriter.WriteLog("Exception", ex.getMessage());
+           // JOptionPane.showMessageDialog(this, "Error Loading Saving Values.", ex.getMessage(), JOptionPane.WARNING_MESSAGE);
         } finally {
             try {
                 fout.close();
             } catch (IOException ex) {
                 Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
-                 JOptionPane.showMessageDialog(this, "Error Saving Persist Values.", ex.getMessage(),JOptionPane.WARNING_MESSAGE);
+                 LogWriter.WriteLog("Exception", ex.getMessage());
+               // JOptionPane.showMessageDialog(this, "Error Saving Persist Values.", ex.getMessage(), JOptionPane.WARNING_MESSAGE);
             }
         }
     }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -666,15 +648,15 @@ public void savePersistValues() {
     }//GEN-LAST:event_SendButton2ActionPerformed
 
     private void SendButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SendButton3ActionPerformed
-       sendButtonClicked(3);
+        sendButtonClicked(3);
     }//GEN-LAST:event_SendButton3ActionPerformed
 
     private void SendButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SendButton4ActionPerformed
-       sendButtonClicked(4);
+        sendButtonClicked(4);
     }//GEN-LAST:event_SendButton4ActionPerformed
 
     private void SendButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SendButton5ActionPerformed
-       sendButtonClicked(5);
+        sendButtonClicked(5);
     }//GEN-LAST:event_SendButton5ActionPerformed
 
     private void SendButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SendButton6ActionPerformed
@@ -683,80 +665,80 @@ public void savePersistValues() {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
-        if(!dispPause){
+        if (!dispPause) {
             jButton1.setText("Play");
-            dispPause=true;
+            dispPause = true;
+        } else {
+            jButton1.setText("Pause");
+            dispPause = false;
         }
-        else {
-             jButton1.setText("Pause");
-            dispPause=false;
-        }
-            
+
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void buttonSelectDirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonSelectDirActionPerformed
         JFileChooser fileChooser = new JFileChooser();
-            fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-            int option = fileChooser.showOpenDialog(this);
-            if(option == JFileChooser.APPROVE_OPTION){
-               File file = fileChooser.getSelectedFile();
-               textSelectedFolder.setText(file.getPath());
-            }
+        fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        int option = fileChooser.showOpenDialog(this);
+        if (option == JFileChooser.APPROVE_OPTION) {
+            File file = fileChooser.getSelectedFile();
+            textSelectedFolder.setText(file.getPath());
+        }
     }//GEN-LAST:event_buttonSelectDirActionPerformed
 
     private void checkSaveToFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkSaveToFileActionPerformed
-        if(checkSaveToFile.isSelected()){
-            if(textSelectedFolder.getText().isEmpty()){
-                 JOptionPane.showMessageDialog(this, "Select folder to save file ","File Logging",JOptionPane.WARNING_MESSAGE);
-                 checkSaveToFile.setSelected(false);
-                 return;
+        if (checkSaveToFile.isSelected()) {
+            if (textSelectedFolder.getText().isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Select folder to save file ", "File Logging", JOptionPane.WARNING_MESSAGE);
+                checkSaveToFile.setSelected(false);
+                return;
             }
-             String fileName = textSelectedFolder.getText()+"/"+ System.currentTimeMillis()+".log";
-             File logFile = new File(fileName);
-            
+            String fileName = textSelectedFolder.getText() + "/" + System.currentTimeMillis() + ".log";
+            File logFile = new File(fileName);
+
             try {
-                saveLogFile = new FileOutputStream(logFile,true);
-                 saveEnabled=true;
+                saveLogFile = new FileOutputStream(logFile, true);
+                saveEnabled = true;
             } catch (IOException ex) {
                 Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
-                saveLogFile=null;
-                saveEnabled=false;
-                 JOptionPane.showMessageDialog(this, "Error creating log file->"+ex.getMessage(),"File Logging",JOptionPane.WARNING_MESSAGE);
+                saveLogFile = null;
+                saveEnabled = false;
+                JOptionPane.showMessageDialog(this, "Error creating log file->" + ex.getMessage(), "File Logging", JOptionPane.WARNING_MESSAGE);
             }
-           JOptionPane.showMessageDialog(this, "Data from/to the connected source will be saved in to the file ","File Logging",JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Data from/to the connected source will be saved in to the file ", "File Logging", JOptionPane.WARNING_MESSAGE);
 
-        }else {
-            JOptionPane.showMessageDialog(this, "Data transfer logging disabled","File Logging",JOptionPane.WARNING_MESSAGE);
-            if(saveLogFile!=null) try {
+        } else {
+            JOptionPane.showMessageDialog(this, "Data transfer logging disabled", "File Logging", JOptionPane.WARNING_MESSAGE);
+            if (saveLogFile != null) try {
                 saveLogFile.close();
             } catch (IOException ex) {
                 Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
+                 LogWriter.WriteLog("Exception", ex.getMessage());
             }
         }
     }//GEN-LAST:event_checkSaveToFileActionPerformed
 
     private void checkboxTimeStampActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkboxTimeStampActionPerformed
         // TODO add your handling code here:
-        timeStampEnabled =checkboxTimeStamp.isSelected();
+        timeStampEnabled = checkboxTimeStamp.isSelected();
     }//GEN-LAST:event_checkboxTimeStampActionPerformed
 
     private void buttonClearTextActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonClearTextActionPerformed
-       
+
         textAreaInputText.setText(null);
         hexView1.ClearContents();
         commandProgExecPanel2.ClearCommandLog();
-         System.gc();
+        System.gc();
     }//GEN-LAST:event_buttonClearTextActionPerformed
 
     private void btnChooseFileToSendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnChooseFileToSendActionPerformed
-         JFileChooser fileChooser = new JFileChooser();
-            fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-            int option = fileChooser.showOpenDialog(this);
-            if(option == JFileChooser.APPROVE_OPTION){
-               File file = fileChooser.getSelectedFile();
-               textSelectedFileForSend.setText(file.getPath());
-               btnSendFile.setEnabled(true);
-            }
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        int option = fileChooser.showOpenDialog(this);
+        if (option == JFileChooser.APPROVE_OPTION) {
+            File file = fileChooser.getSelectedFile();
+            textSelectedFileForSend.setText(file.getPath());
+            btnSendFile.setEnabled(true);
+        }
     }//GEN-LAST:event_btnChooseFileToSendActionPerformed
 
     private void SendText1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SendText1ActionPerformed
@@ -772,92 +754,91 @@ public void savePersistValues() {
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
-                try{
-                 byte [] dat = new byte[200];
-                 long fileSize = new File(textSelectedFileForSend.getText()).length();
-                 int lastPack =(int) fileSize%200;
-                 long pos=0;
-                 
-                 InputStream inputStream = new FileInputStream(textSelectedFileForSend.getText());
-                 while(pos<fileSize){
-                     textAreaInputText.append("Sending packet - "+pos+"\r\n");
-                     inputStream.read(dat);
-                     CommonDataArea.connection.send(dat);
-                     pos+=200;
-                     
-                 }
-               
-                if(lastPack>0){
-                    byte [] lastBytes = new byte[lastPack];
-                    inputStream.read(lastBytes);
-                    CommonDataArea.connection.send(lastBytes);
-                }
-                
-                inputStream.close();
-                 
-                }catch(Exception exp){
-                    
+                try {
+                    byte[] dat = new byte[200];
+                    long fileSize = new File(textSelectedFileForSend.getText()).length();
+                    int lastPack = (int) fileSize % 200;
+                    long pos = 0;
+
+                    InputStream inputStream = new FileInputStream(textSelectedFileForSend.getText());
+                    while (pos < fileSize) {
+                        textAreaInputText.append("Sending packet - " + pos + "\r\n");
+                        inputStream.read(dat);
+                        CommonDataArea.connection.send(dat);
+                        pos += 200;
+
+                    }
+
+                    if (lastPack > 0) {
+                        byte[] lastBytes = new byte[lastPack];
+                        inputStream.read(lastBytes);
+                        CommonDataArea.connection.send(lastBytes);
+                    }
+
+                    inputStream.close();
+
+                } catch (Exception exp) {
+
                 }
             }
         });
         thread.start();
     }//GEN-LAST:event_btnSendFileActionPerformed
-       enum SendMode{
+    enum SendMode {
         Ascii,
         Hex,
         File
     }
-    void sendButtonClicked(int buttonNum)
-    {
-        try{
-        SendMode sendMode=SendMode.Ascii;
-        String compoName = "SendText"+buttonNum;
-        JTextField sednText=new JTextField();
-        JPanel sendOpPanel=null;
-        for(Component sendTextCom:CommandInputContralArrayPanel.getComponents()){
-            try{
-                if(((JTextField)sendTextCom).getName().contains(compoName))
-                {
-                    sednText = (JTextField)sendTextCom;
-                    break;
+
+    void sendButtonClicked(int buttonNum) {
+        try {
+            SendMode sendMode = SendMode.Ascii;
+            String compoName = "SendText" + buttonNum;
+            JTextField sednText = new JTextField();
+            JPanel sendOpPanel = null;
+            for (Component sendTextCom : CommandInputContralArrayPanel.getComponents()) {
+                try {
+                    if (((JTextField) sendTextCom).getName().contains(compoName)) {
+                        sednText = (JTextField) sendTextCom;
+                        break;
+                    }
+                } catch (java.lang.ClassCastException exp) {
+
                 }
-            }catch(java.lang.ClassCastException exp){
-                
             }
-        }
-         compoName = "SendOp"+buttonNum;
-         for(Component sendOpPan:CommandInputContralArrayPanel.getComponents()){
-            try{
-            if(((JPanel)sendOpPan).getName().contains(compoName))
-            {
-                sendOpPanel = (JPanel)sendOpPan;
-                break;
+            compoName = "SendOp" + buttonNum;
+            for (Component sendOpPan : CommandInputContralArrayPanel.getComponents()) {
+                try {
+                    if (((JPanel) sendOpPan).getName().contains(compoName)) {
+                        sendOpPanel = (JPanel) sendOpPan;
+                        break;
+                    }
+                } catch (java.lang.ClassCastException exp) {
+
+                }
             }
-            }catch(java.lang.ClassCastException exp){
-                
-            }
-        }
-         if(sendOpPanel!=null){
-            for(Component sendOp:sendOpPanel.getComponents()){
-                try{
-                    if((((JRadioButton)sendOp).getText().contains("Ascii"))&&(((JRadioButton)sendOp).isSelected())){
-                       sendMode = SendMode.Ascii;
-                    } else if((((JRadioButton)sendOp).getText().contains("Hex"))&&(((JRadioButton)sendOp).isSelected())){
-                       sendMode = SendMode.Hex;
-                    } else if((((JRadioButton)sendOp).getText().contains("File"))&&(((JRadioButton)sendOp).isSelected())){
-                       sendMode = SendMode.File;
+            if (sendOpPanel != null) {
+                for (Component sendOp : sendOpPanel.getComponents()) {
+                    try {
+                        if ((((JRadioButton) sendOp).getText().contains("Ascii")) && (((JRadioButton) sendOp).isSelected())) {
+                            sendMode = SendMode.Ascii;
+                        } else if ((((JRadioButton) sendOp).getText().contains("Hex")) && (((JRadioButton) sendOp).isSelected())) {
+                            sendMode = SendMode.Hex;
+                        } else if ((((JRadioButton) sendOp).getText().contains("File")) && (((JRadioButton) sendOp).isSelected())) {
+                            sendMode = SendMode.File;
+                        }
+                    } catch (java.lang.ClassCastException exp) {
                     }
                 }
-                catch(java.lang.ClassCastException exp){
             }
-           }
-         }
-         String text = sednText.getText();
-         byte[] toSend =convertToAscii(text);
-         MainControler.send(toSend);
-         logToFile(toSend,false,timeStampEnabled);
-         if(checkboxEcho.isSelected())  textAreaInputText.append(text);
-    /*     Timer timer = new Timer(1,new ActionListener() {
+            String text = sednText.getText();
+            byte[] toSend = convertToAscii(text);
+            MainControler.send(toSend);
+            logToFile(toSend, false, timeStampEnabled);
+            if (checkboxEcho.isSelected()) {
+                textAreaInputText.append(text);
+            }
+            /*     Timer timer = new Timer(1,new ActionListener() {
              int i=0;
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -867,160 +848,161 @@ public void savePersistValues() {
             }
          });
          timer.start();*/
-        /* JOptionPane.showMessageDialog(null, 
+ /* JOptionPane.showMessageDialog(null, 
                               "Text to send", 
                               text, 
                               JOptionPane.WARNING_MESSAGE);*/
-        }catch(Exception exp){
-            JOptionPane.showMessageDialog(null, 
-                              "Erron in Message sending", 
-                              exp.getMessage(), 
-                              JOptionPane.WARNING_MESSAGE);
+        } catch (Exception exp) {
+            JOptionPane.showMessageDialog(null,
+                    "Erron in Message sending",
+                    exp.getMessage(),
+                    JOptionPane.WARNING_MESSAGE);
         }
     }
-   
+
     //all escape charectors to support
     //https://en.wikipedia.org/wiki/Escape_sequences_in_C
-    byte[] convertToAscii(String inputString){
-        if(inputString.contains("//")){ //checking for comment
+    byte[] convertToAscii(String inputString) {
+        if (inputString.contains("//")) { //checking for comment
             inputString = inputString.substring(0, inputString.indexOf("//"));
         }
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream( );
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         boolean escFound = false;
         boolean hexExtract = false;
-        String hexBytes="";
-        int hexCount=0;
+        String hexBytes = "";
+        int hexCount = 0;
         ArrayList<String> hexVals = new ArrayList<String>();
-        try{
-        for(int i=0;i<inputString.length();++i){
-            if(hexExtract){
-                if((inputString.charAt(i)!=' ')&&(inputString.charAt(i)!='\\')){
-                    hexBytes+=inputString.charAt(i);
-                    if(hexCount%2==1){
-                        hexVals.add(hexBytes);
-                        hexBytes=new String("");
+        try {
+            for (int i = 0; i < inputString.length(); ++i) {
+                if (hexExtract) {
+                    if ((inputString.charAt(i) != ' ') && (inputString.charAt(i) != '\\')) {
+                        hexBytes += inputString.charAt(i);
+                        if (hexCount % 2 == 1) {
+                            hexVals.add(hexBytes);
+                            hexBytes = new String("");
+                        }
+                        hexCount++;
+                    } else {
+                        for (String hexValStr : hexVals) {
+                            int hexVal = Integer.parseInt(hexValStr, 16);
+                            outputStream.write(hexVal);
+                        }
+                        hexExtract = false;
+                        hexVals.clear();
                     }
-                    hexCount++;
-                 }else{
-                    for(String hexValStr :hexVals ){
-                    int hexVal = Integer.parseInt(hexValStr, 16);
-                     outputStream.write(hexVal);
-                    }
-                     hexExtract=false;
-                     hexVals.clear();
+                    continue;
                 }
-                continue;
-            }
-            if(escFound){
-                switch(inputString.charAt(i)){
-                    case 'r':
-                        outputStream.write(0x0D);
-                        break;
-                    case 'n':
-                        outputStream.write(0x0A);
-                        break;
-                    case 't':
-                        outputStream.write(0x09);
-                        break;
-                     case '\\':
-                        outputStream.write(0x5c);
-                        break;
-                    case 'x':
-                        hexBytes="";
-                        hexExtract=true;
-                        hexCount=0;
-                        break;
-                }
-                escFound=false;
-                continue;
-            }
-            if(inputString.charAt(i)!='\\'){
-            outputStream.write(inputString.charAt(i));
-            }else{
-                escFound=true;
-            }
-        }
-        if(hexExtract){
-            for(String hexValStr :hexVals ){
-                    int hexVal = Integer.parseInt(hexValStr, 16);
-                     outputStream.write(hexVal);
+                if (escFound) {
+                    switch (inputString.charAt(i)) {
+                        case 'r':
+                            outputStream.write(0x0D);
+                            break;
+                        case 'n':
+                            outputStream.write(0x0A);
+                            break;
+                        case 't':
+                            outputStream.write(0x09);
+                            break;
+                        case '\\':
+                            outputStream.write(0x5c);
+                            break;
+                        case 'x':
+                            hexBytes = "";
+                            hexExtract = true;
+                            hexCount = 0;
+                            break;
                     }
-                     hexExtract=false;
-                     hexVals.clear();
-        }
-       return outputStream.toByteArray();
-        }catch(Exception exp){
-             JOptionPane.showMessageDialog(null, 
-                              "Erron in input text", 
-                              exp.getMessage(), 
-                              JOptionPane.WARNING_MESSAGE);
+                    escFound = false;
+                    continue;
+                }
+                if (inputString.charAt(i) != '\\') {
+                    outputStream.write(inputString.charAt(i));
+                } else {
+                    escFound = true;
+                }
+            }
+            if (hexExtract) {
+                for (String hexValStr : hexVals) {
+                    int hexVal = Integer.parseInt(hexValStr, 16);
+                    outputStream.write(hexVal);
+                }
+                hexExtract = false;
+                hexVals.clear();
+            }
+            return outputStream.toByteArray();
+        } catch (Exception exp) {
+            JOptionPane.showMessageDialog(null,
+                    "Erron in input text",
+                    exp.getMessage(),
+                    JOptionPane.WARNING_MESSAGE);
         }
         return null;
     }
-    
-    void logToFile(byte [] data,boolean fromDevice, boolean addTimeStamp){
-         String hint="";
-         if(saveEnabled){
+
+    void logToFile(byte[] data, boolean fromDevice, boolean addTimeStamp) {
+        String hint = "";
+        if (saveEnabled) {
+            try {
+                if (addTimeStamp) {
+                    hint = "\n";
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss.SSS");
+                    Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+                    String times = sdf.format(timestamp);
+                    hint += times;
+                    if (fromDevice) {
+                        hint += ": From Device: ";
+                    } else {
+                        hint += ": To Device: ";
+                    }
+                    saveLogFile.write(hint.getBytes());
+                }
+
+                saveLogFile.write(data);
+                saveLogFile.flush();
+            } catch (IOException ex) {
+                Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
+                saveEnabled = false;
                 try {
-                    if(addTimeStamp){
-                        hint="\n";
-                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss.SSS");
-                        Timestamp timestamp =  new Timestamp(System.currentTimeMillis());
-                        String times = sdf.format(timestamp);
-                        hint += times;
-                        if(fromDevice){
-                            hint += ": From Device: ";
-                        }else {
-                            hint += ": To Device: ";
-                        }
-                        saveLogFile.write(hint.getBytes());
-                    }
-                    
-                    saveLogFile.write(data);
-                    saveLogFile.flush();
-                } catch (IOException ex) {
-                    Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
-                    saveEnabled=false;
-                    try {
-                        saveLogFile.close();
-                    } catch (IOException ex1) {
-                        Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex1);
-                    }
+                    saveLogFile.close();
+                } catch (IOException ex1) {
+                    Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex1);
                 }
             }
+        }
     }
-    
-    void logToFile(byte [] data,int numBytes,boolean fromDevice, boolean addTimeStamp){
-         String hint="";
-         if(saveEnabled){
+
+    void logToFile(byte[] data, int numBytes, boolean fromDevice, boolean addTimeStamp) {
+        String hint = "";
+        if (saveEnabled) {
+            try {
+                if (addTimeStamp) {
+                    hint = "\n";
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss.SSS");
+                    Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+                    String times = sdf.format(timestamp);
+                    hint += times;
+                    if (fromDevice) {
+                        hint += ": From Device: ";
+                    } else {
+                        hint += ": To Device: ";
+                    }
+                    saveLogFile.write(hint.getBytes());
+                }
+
+                saveLogFile.write(data, 0, numBytes);
+                saveLogFile.flush();
+            } catch (IOException ex) {
+                Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
+                saveEnabled = false;
                 try {
-                    if(addTimeStamp){
-                        hint="\n";
-                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss.SSS");
-                        Timestamp timestamp =  new Timestamp(System.currentTimeMillis());
-                        String times = sdf.format(timestamp);
-                        hint += times;
-                        if(fromDevice){
-                            hint += ": From Device: ";
-                        }else {
-                            hint += ": To Device: ";
-                        }
-                        saveLogFile.write(hint.getBytes());
-                    }
-                    
-                    saveLogFile.write(data, 0,numBytes);
-                    saveLogFile.flush();
-                } catch (IOException ex) {
-                    Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
-                    saveEnabled=false;
-                    try {
-                        saveLogFile.close();
-                    } catch (IOException ex1) {
-                        Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex1);
-                    }
+                    saveLogFile.close();
+                } catch (IOException ex1) {
+                    Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex1);
                 }
             }
+        }
     }
+
     /**
      * @param args the command line arguments
      */
@@ -1048,7 +1030,7 @@ public void savePersistValues() {
         }
         //</editor-fold>
         //</editor-fold>
-
+        
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
@@ -1056,78 +1038,81 @@ public void savePersistValues() {
             }
         });
     }
-   
+
     long lastTime;
     String bufferedString;
-    int countTime=0;
-    class ConEventsHandler implements IConnectionEvents{
-        @Override
-        public void onReceive(byte[] data, int numBytes,IConnection eventSource,Object eventInfo) {
-            
-            if(!dispPause){
-            if(HexNormalViewHolder.getSelectedIndex()==0){
-              if(checkRealtimeDisplay.isSelected())
-              {
-                  bufferedString +=  new String(data);
-                  textAreaInputText.append(bufferedString);
-                  bufferedString ="";
-              }else{
-              if((System.currentTimeMillis()-lastTime) <20){
-                  bufferedString +=  new String(data);
-                  ++countTime;
-                  if(countTime>5){
-                      textAreaInputText.append(bufferedString);
-                      bufferedString ="";
-                      countTime=0;
-                  }
-                 
-              }
-              else{
-                  bufferedString +=  new String(data);
-                  textAreaInputText.append(bufferedString);
-                  bufferedString ="";
-              }
-              lastTime = System.currentTimeMillis();
-              }
-              // InputText.append(s);
-              // InputText.setCaretPosition(InputText.getDocument().getLength());
-              
-               textAreaInputText.setCaretPosition(textAreaInputText.getText().length());
-            }else if(HexNormalViewHolder.getSelectedIndex()==1){
-                hexView1.appendData(data, numBytes);
-            }
-            }
-           
-           logToFile(data,numBytes,true,timeStampEnabled);
-        }
+    int countTime = 0;
 
+    class ConEventsHandler implements IConnectionEvents {
+
+        @Override
+        public void onReceive(byte[] data, int numBytes, IConnection eventSource, Object eventInfo) {
+
+            if (!dispPause) {
+                if (HexNormalViewHolder.getSelectedIndex() == 0) {
+                    if (checkRealtimeDisplay.isSelected()) {
+                        bufferedString += new String(data);
+                        textAreaInputText.append(bufferedString);
+                        bufferedString = "";
+                    } else {
+                        if ((System.currentTimeMillis() - lastTime) < 20) {
+                            bufferedString += new String(data);
+                            ++countTime;
+                            if (countTime > 5) {
+                                textAreaInputText.append(bufferedString);
+                                bufferedString = "";
+                                countTime = 0;
+                            }
+
+                        } else {
+                            bufferedString += new String(data);
+                            textAreaInputText.append(bufferedString);
+                            bufferedString = "";
+                        }
+                        lastTime = System.currentTimeMillis();
+                    }
+                    // InputText.append(s);
+                    // InputText.setCaretPosition(InputText.getDocument().getLength());
+
+                    textAreaInputText.setCaretPosition(textAreaInputText.getText().length());
+                } else if (HexNormalViewHolder.getSelectedIndex() == 1) {
+                    hexView1.appendData(data, numBytes);
+                }
+            }
+
+            logToFile(data, numBytes, true, timeStampEnabled);
+        }
 
         @Override
         public void onConnectionModeChange(MainControler.ConnectionMode mode) {
-          if(CommonDataArea.connection!=null)CommonDataArea.connection.close();
-          if(mode== MainControler.ConnectionMode.Serial){
-              CardLayout cardLayout =(CardLayout) ConnectionParamPanel.getLayout();
-              cardLayout.show(ConnectionParamPanel, "card2");
-          }//TCPClient
-          else if(mode== MainControler.ConnectionMode.TCPClient){
-              CardLayout cardLayout =(CardLayout) ConnectionParamPanel.getLayout();
-              cardLayout.show(ConnectionParamPanel, "card3");
-          }
-          else if(mode== MainControler.ConnectionMode.TCPServer){
-              CardLayout cardLayout =(CardLayout) ConnectionParamPanel.getLayout();
-              cardLayout.show(ConnectionParamPanel, "card4");
-          }
-           else if(mode== MainControler.ConnectionMode.USB){
-              CardLayout cardLayout =(CardLayout) ConnectionParamPanel.getLayout();
-              cardLayout.show(ConnectionParamPanel, "card5");
-          }
+            if (CommonDataArea.connection != null) {
+                CommonDataArea.connection.close();
+            }
+            if (mode == MainControler.ConnectionMode.Serial) {
+                CardLayout cardLayout = (CardLayout) ConnectionParamPanel.getLayout();
+                cardLayout.show(ConnectionParamPanel, "card2");
+            }//TCPClient
+            else if (mode == MainControler.ConnectionMode.TCPClient) {
+                CardLayout cardLayout = (CardLayout) ConnectionParamPanel.getLayout();
+                cardLayout.show(ConnectionParamPanel, "card3");
+            } else if (mode == MainControler.ConnectionMode.TCPServer) {
+                CardLayout cardLayout = (CardLayout) ConnectionParamPanel.getLayout();
+                cardLayout.show(ConnectionParamPanel, "card4");
+            } else if (mode == MainControler.ConnectionMode.USB) {
+                CardLayout cardLayout = (CardLayout) ConnectionParamPanel.getLayout();
+                cardLayout.show(ConnectionParamPanel, "card5");
+            }
         }
 
         @Override
         public void onEvent(MainControler.ConEvents event, Object param, Object source) {
-            if(event == ConEvents.Connected) textAreaInputText.append((String)param);
-             else if(event == ConEvents.ConFailed)  textAreaInputText.append((String)param);
-             else if(event == ConEvents.ConClosed)  textAreaInputText.append((String)param); 
+            if (event == ConEvents.Connected) {
+                textAreaInputText.append((String) param);
+            } else if (event == ConEvents.ConFailed) {
+                textAreaInputText.append((String) param);
+            } else if (event == ConEvents.ConClosed) {
+                textAreaInputText.append((String) param);
+            }
         }
 
         @Override
@@ -1139,7 +1124,7 @@ public void savePersistValues() {
         public void onSelectedConChange(IConnection connection) {
             throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
         }
-                 
+
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

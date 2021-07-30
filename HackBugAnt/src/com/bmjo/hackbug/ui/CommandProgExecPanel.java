@@ -7,6 +7,7 @@ package com.bmjo.hackbug.ui;
 
 import com.bmjo.hackbug.core.CommandExecStatus;
 import com.bmjo.hackbug.core.CommandInterpretor;
+import com.bmjo.hackbug.utils.LogWriter;
 import static com.sun.java.accessibility.util.AWTEventMonitor.addWindowListener;
 import java.awt.Component;
 import java.awt.event.WindowAdapter;
@@ -196,20 +197,16 @@ public class CommandProgExecPanel extends javax.swing.JPanel implements CommandE
     public void loadPerstValues() {
         ObjectInputStream objectinputstream = null;
         try {
-            String jarPath = "excpetion";
-            try {
-                jarPath = MainForm.class
-                        .getProtectionDomain()
-                        .getCodeSource()
-                        .getLocation()
-                        .toURI()
-                        .getPath();
-            } catch (URISyntaxException ex) {
-                Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
+           // String jarPath = System.getProperty("user.dir");
+           // String filePath = jarPath;
+            
+            String filePath = System.getProperty("user.home")+"//hackbug//lastscript.scr";
+            File f = new File(filePath);
+            if(!f.exists()){
+                filePath = System.getProperty("user.dir")+"//lastscript.scr";
             }
-
-            String filePath = jarPath;
-            filePath = filePath.substring(0, filePath.lastIndexOf("/")) + "/lastscript.scr";
+            //     filePath = filePath.substring(0, filePath.lastIndexOf("/")) + "/lastscript.scr";
+           // filePath += "/lastscript.scr";
             FileInputStream streamIn = new FileInputStream(filePath);
             objectinputstream = new ObjectInputStream(streamIn);
 
@@ -220,6 +217,7 @@ public class CommandProgExecPanel extends javax.swing.JPanel implements CommandE
             }
         } catch (Exception e) {
             Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, e);
+             LogWriter.WriteLog("Exception", e.getMessage());
             // JOptionPane.showMessageDialog(this, "Error Loading Persist Values.", e.getMessage(),JOptionPane.WARNING_MESSAGE);
         } finally {
 
@@ -229,22 +227,8 @@ public class CommandProgExecPanel extends javax.swing.JPanel implements CommandE
     public void savePersistValues() {
         FileOutputStream fout = null;
         try {
-            String jarPath = "excpetion";
-            try {
-                jarPath = MainForm.class
-                        .getProtectionDomain()
-                        .getCodeSource()
-                        .getLocation()
-                        .toURI()
-                        .getPath();
-            } catch (URISyntaxException ex) {
-                Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
-            }
-
-            String filePath = jarPath;
-
-            filePath = filePath.substring(0, filePath.lastIndexOf("/")) + "/lastscript.scr";
-            // JOptionPane.showMessageDialog(this, filePath,"File Ptah",JOptionPane.WARNING_MESSAGE);
+            String filePath = System.getProperty("user.home")+"//hackbug//lastscript.scr";
+         
 
             fout = new FileOutputStream(filePath);
             ObjectOutputStream oos;
@@ -255,15 +239,18 @@ public class CommandProgExecPanel extends javax.swing.JPanel implements CommandE
 
         } catch (FileNotFoundException ex) {
             Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
+            LogWriter.WriteLog("Exception", ex.getMessage());
             // JOptionPane.showMessageDialog(this, "Error Saving Persist Values.", ex.getMessage(),JOptionPane.WARNING_MESSAGE);
         } catch (IOException ex) {
             Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
+             LogWriter.WriteLog("Exception", ex.getMessage());
             // JOptionPane.showMessageDialog(this, "Error Loading Saving Values.", ex.getMessage(),JOptionPane.WARNING_MESSAGE);
         } finally {
             try {
                 fout.close();
             } catch (IOException ex) {
                 Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
+                 LogWriter.WriteLog("Exception", ex.getMessage());
                 //JOptionPane.showMessageDialog(this, "Error Saving Persist Values.", ex.getMessage(),JOptionPane.WARNING_MESSAGE);
             }
         }

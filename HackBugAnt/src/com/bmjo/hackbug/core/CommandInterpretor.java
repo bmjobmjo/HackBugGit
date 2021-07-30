@@ -5,6 +5,7 @@
  */
 package com.bmjo.hackbug.core;
 
+import com.bmjo.hackbug.utils.LogWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.Console;
 import java.io.FileNotFoundException;
@@ -385,7 +386,7 @@ public class CommandInterpretor implements IConnectionEvents {
                                     waitObject.wait(60000);
                                 }
                             } catch (Exception exp) {
-
+                                     LogWriter.WriteLog("Exception", exp.getMessage());
                             }
                             waitFlag = false;
                             sendStatus(CMD_WAITFOR, "Execution completed");
@@ -461,7 +462,7 @@ public class CommandInterpretor implements IConnectionEvents {
                         waitObject.wait(60000);
                     }
                 } catch (Exception exp) {
-
+                         LogWriter.WriteLog("Exception", exp.getMessage());
                 }
             }
 
@@ -493,7 +494,7 @@ public class CommandInterpretor implements IConnectionEvents {
 
         void CommandListReader() {
             JSONParser jsonParser = new JSONParser();
-            String fileName = ClassLoader.getSystemResource("res/scriptcommands.json").getFile();
+            String fileName = ClassLoader.getSystemResource("scriptcommands.json").getFile();
             try (FileReader reader = new FileReader(fileName)) {
                 //Read JSON file
                 Object obj = jsonParser.parse(reader);
@@ -503,10 +504,13 @@ public class CommandInterpretor implements IConnectionEvents {
 
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
+                 LogWriter.WriteLog("Exception", e.getMessage());
             } catch (IOException e) {
                 e.printStackTrace();
+                 LogWriter.WriteLog("Exception", e.getMessage());
             } catch (org.json.simple.parser.ParseException ex) {
                 Logger.getLogger(CommandInterpretor.class.getName()).log(Level.SEVERE, null, ex);
+                LogWriter.WriteLog("Exception", ex.getMessage());
             }
         }
 
